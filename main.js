@@ -2,12 +2,17 @@
 _taguchi: false */
 
 function view_to_fn(_view_fn) {
-    return new Function('template, request, index, list', 'var subscriber=request.subscriber,event=request.event,parent=request.parent,revision=template.revision,activity=template.activity,config=template.config,campaign=template.campaign;' + _view_fn);
+    return new Function('template, request, jsonpointer, analytics, util, render, index, list', 'var subscriber=request.subscriber,event=request.event,parent=request.parent,revision=template.revision,activity=template.activity,config=template.config,campaign=template.campaign;' + _view_fn);
 }
 
 var util = require('util'), fs = require('fs'), path = require('path'),
-    view = require('./view'), stats = require('taguchi/storage'),
-    jsonpointer = require('./jsonpointer');
+    view = require('./view'), stats = require('taguchi/storage'), 
+    analytics = require('taguchi/analytics'), 
+    storage = require('taguchi/storage'),
+    jsonpointer = require('./jsonpointer'),
+    evtmap = {'s': 'send', 'o': 'open', 'v': 'view', 'b': 'bounce', 
+        'r': 'reply', 'c': 'click', 'wa': 'analytics', 'f': 'forward', 
+        'u': 'unsubscribe', 'rq': 'report'};
 
 // Creates a new template with the specified name
 exports.define = function(name) {
@@ -69,17 +74,6 @@ exports.define = function(name) {
                 "sms": [],
                 "http": []
             },
-            // These handlers are used administratively/internally, 
-            // and are format-oriented. Wildcard handlers ('*') are called 
-            // before format-specific handlers.
-            "render": { // Called to generate message content and previews
-                "*": [],
-                "html": [],
-                "text": [],
-                "mime": [],
-                "sms": [],
-                "html-with-overlay": []
-            },
             "report": {
                 "*": [],
                 "html": [],
@@ -92,13 +86,13 @@ exports.define = function(name) {
     template.views[name] = {};
     
     template._loadOwnViews = function() {
-        var i, l, glob = this.name + '/views/*', viewname,
+        var i, l, glob = this.name + '/views/*', viewname, self = this,
             re = new RegExp(glob.replace('.', '\\.').replace('*', '.*'));
         // load all files in the 'views' subdirectory
         util.each(_taguchi.packages, function(fpath, file) {
             if (re.test(fpath)) { // path matches
                 viewname = path.basename(fpath).split('.')[0];
-                this.views[name][viewname] = view_to_fn(
+                self.views[name][viewname] = view_to_fn(
                     view.compile(file.content,
                         path.extname(fpath) === 'txt' ? true : false)
                 );
@@ -109,52 +103,56 @@ exports.define = function(name) {
     
     template._copyHooks = function(source) {
         // copy all in source, including stuff source depends on
+        var self = this;
         util.each(this.hooks, function(hook, chain) {
             util.each(source.hooks[hook], function(template_name, fn) {
-                this.hooks[hook][template_name] = fn;
+                self.hooks[hook][template_name] = fn;
             });
         });
     };
     
     template._copyViews = function(source) {
         // copy everything, including dependencies
+        var self = this;
         util.each(source.views, function(template_name, views) {
+            self.views[template_name] = {};
             util.each(views, function(view_name, fn) {
-                this.views[template_name][view_name] = fn;
+                self.views[template_name][view_name] = fn;
             });
         });
     };
     
     template._copyHandlers = function(source) {
+        var self = this;
         util.each(this.handlers, function(cat, handlers) {
             util.each(handlers, function(subcat, chain) {
                 // prepend our set of handlers to the template's current
                 // handler set -- just in case someone adds handlers before
                 // calling basedOn
-                this.handlers[cat][subcat] = 
+                self.handlers[cat][subcat] = 
                     source.handlers[cat][subcat].concat(
-                        this.handlers[cat][subcat]);
+                        self.handlers[cat][subcat]);
             });
         });
     };
     
     template._prepare = function() {
         // Set up revision and request content
-        this.config = JSON.parse(storage.getItem('config'));
-        this.revision = JSON.parse(storage.setItem('revision'));
-        this.activity = JSON.parse(storage.setItem('activity'));
-        this.campaign = JSON.parse(storage.setItem('campaign'));
+        this.config = JSON.parse(storage.getItem('config') || '{}');
+        this.revision = JSON.parse(storage.getItem('revision') || '{}');
+        this.activity = JSON.parse(storage.getItem('activity') || '{}');
+        this.campaign = JSON.parse(storage.getItem('campaign') || '{}');
         
         // Work out mapping of currently-visible views -- try to find the view 
         // in the descendant template, then each template in the inheritance 
         // hierarchy, then in the mixins in reverse order.
-        
-        util.each(this.mixins.concat(this.ancestors.concat), function(idx, 
+        var self = this;
+        util.each(this.mixins.concat(this.ancestors), function(idx, 
                 mixin_name) {
-            util.each(this.views[mixin_name], function(view_name, view_fn) {
+            util.each(self.views[mixin_name], function(view_name, view_fn) {
                 // if view name is not already in the visible map, add this 
                 // version of it
-                this._visible_views[view_name] = view_fn;
+                self._visible_views[view_name] = view_fn;
             });
         });
     };
@@ -162,7 +160,13 @@ exports.define = function(name) {
     template.basedOn = function(module_name_or_module) {
         var base_template = module_name_or_module;
         if (util.type(module_name_or_module) == 'string') {
-            // load the module
+            // load the module -- special-case included modules
+            if (module_name_or_module == 'BaseEmail' || 
+                    module_name_or_module == 'BaseSMS' ||
+                    module_name_or_module == 'BaseWebPage') {
+                module_name_or_module = 
+                    'template/' + module_name_or_module + '/main';
+            }
             base_template = require(module_name_or_module);
         }
         // now copy the hooks, handlers and views from the base module
@@ -283,20 +287,27 @@ exports.define = function(name) {
     
     // Render a view -- mappings have already been worked out in _prepare()
     template.render = function(view_name, content, request) {
-        var fn = this._visible_views[view_name], i, l, str;
+        var fn = this._visible_views[view_name], i, l, str, 
+            render_fn = function(view_name, content) { 
+                return request.render(view_name, content); 
+            };
+        
         if (this._visible_views[view_name] === undefined) {
             fn = jsonpointer.get(this.views, view_name);
         }
+        
         // Pass 'content' as the value of this for the view, along with the
         // template and the request
         if (content.length !== undefined) {
             str = '';
             for (i = 0, l = content.length; i < l; i++) {
-                str += fn.call(content[i], this, request, i, content);
+                str += fn.call(content[i], this, request, jsonpointer, 
+                            analytics, util, render_fn, i, content);
             }
             return str;
         } else {
-            return fn.call(content, this, request, 0, [content]);
+            return fn.call(content, this, request, jsonpointer, analytics, 
+                        util, render_fn, 0, [content]);
         }
     };
     
@@ -310,13 +321,15 @@ exports.define = function(name) {
         this.subscriber = request.subscriber;
         this.event = request.event;
         this.revision = template.revision;
+        this.activity = template.activity;
+        this.campaign = template.campaign;
         this.config = template.config;
     };
     
     Response.prototype.set = function(jpath, value) {
         value = typeof value === "function" ? 
             value(jsonpointer.get(this._response, jpath)) : value;
-        jsonpointer.set(this.response, jpath, value);
+        jsonpointer.set(this._response, jpath, value);
         return this;
     };
     
@@ -356,13 +369,10 @@ exports.define = function(name) {
     
     // Clones the current context, and calls the appropriate handlers for the 
     // given event, with the template as 'this'.
-    template.request = function(request) {
-        var i, l, e  = req.event.split('.'), 
-            handlers = this.handlers[e[0]],
-            response = new Response(this, request);
-        
-        // set up view globals
-        view.prepare(this, response);
+    template.handleRequest = function(request) {
+        var i, l, h, handlers = this.handlers[evtmap[request.event.ref]],
+            response = new Response(this, request), 
+            proto = request.event.protocol;
         
         for (i = 0, l = this.ancestors.length; i < l; i++) {
             if (this.hooks.request[this.ancestors[i]]) {
@@ -372,11 +382,11 @@ exports.define = function(name) {
         }
         
         // call each handler function
-        for (i = 0, l = (handlers['*'] || []).length; i < l; i++) {
-            response = handlers['*'][i].call(response) || response;
+        for (i = 0, h = (handlers['*'] || []), l = h.length; i < l; i++) {
+            response = h[i].call(response) || response;
         }
-        for (i = 0, l = (handlers[e[1]] || []).length; i < l; i++) {
-            response = handlers[e[1]][i].call(response) || response;
+        for (i = 0, h = (handlers[proto] || []), l = h.length; i < l; i++) {
+            response = h[i].call(response) || response;
         }
         return response._response_content;
     };

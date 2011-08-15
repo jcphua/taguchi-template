@@ -1,9 +1,10 @@
 /*global require: false, module: false, id: false, uri: false */
 
 var template = require('template'),
-    view = require('./view'),
+    view = require('../view'),
     storage = require('taguchi/storage'),
     analytics = require('taguchi/analytics'),
+    util = require('util'),
     mime = require('mime'),
     BaseEmail = template.define('BaseEmail'),
     events = {
@@ -29,6 +30,12 @@ BaseEmail.init(function() {
     storage.stats.zeroUniqueCounter('unsubscribed', 0.01, 10000000);
 });
 
+BaseEmail.load(function() {
+    this.BaseEmail = {
+        baseURL: 'http://' + this.config.hostname + '/'
+    };
+});
+
 BaseEmail.request(function(request, response) {
     // Update base email stats
     if (!request.test && events[request.event.ref]) {
@@ -44,7 +51,7 @@ BaseEmail.request(function(request, response) {
 BaseEmail.on('send.smtp', function() {
     // Create the response structure
     this.set('/headers', {
-            'Return-Path': '<' + this.revision.config.instance + '.' + 
+            'Return-Path': '<' + this.config.instance + '.' + 
                 this.event.id + '.' + this.subscriber.hash + 
                 '@clients.taguchimail.com',
             'From': 'support@taguchimail.com',
@@ -62,14 +69,20 @@ BaseEmail.on('send.smtp', function() {
                 'Content-Type': 'text/plain; charset="utf-8"',
                 'Content-Transfer-Encoding': '8bit'
             },
-            body: this.render('text', this.revision.content)
+            body: analytics.addRawClickTracking(
+                    this.render('text', this.revision.content), 
+                    this.template.BaseEmail.baseURL, this.event.id, 
+                    this.subscriber.hash)
         })
         .append('/subparts', {
             headers: {
                 'Content-Type': 'text/html; charset="utf-8"',
                 'Content-Transfer-Encoding': '8bit'
             },
-            body: this.render('html', this.revision.content)
+            body: analytics.addHTMLClickTracking(
+                    this.render('html', this.revision.content), 
+                    this.template.BaseEmail.baseURL, this.event.id, 
+                    this.subscriber.hash)
         })
         .applyFormat(mime.format);
 });
