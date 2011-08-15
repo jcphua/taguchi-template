@@ -1,0 +1,16 @@
+{
+    "name"          : "BaseWebPage",
+    "description"   : "Taguchi base web page template",
+    "homepage"      : "https://github.com/taguchimail/taguchi-template",
+    "keywords"      : [],
+    "author"        : "TaguchiMarketing Pty Ltd",
+    "dependencies"  : {"template": ">=1.0dev1", "taguchi": ">=1.0dev1"},
+    "repositories"  : [{
+        "type": "git", 
+        "url": "git://github.com/taguchimail/taguchi-template.git",
+        "path": "BaseWebPage"
+    }],
+    "main"          : "main.js",
+    "version"       : "1.0dev1",
+    "engines"       : {"taguchi": ">=1.0dev1"}
+}
