@@ -354,7 +354,7 @@ exports.define = function(name) {
         return this;
     };
     
-    Response.prototype.runHandlerFrom = function(module_or_module_name) {
+    Response.prototype.applyHandlerFrom = function(module_or_module_name) {
         return this;
     };
     

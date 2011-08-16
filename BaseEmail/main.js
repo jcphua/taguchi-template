@@ -6,6 +6,7 @@ var template = require('template'),
     analytics = require('taguchi/analytics'),
     util = require('util'),
     mime = require('mime'),
+    http = require('http'),
     BaseEmail = template.define('BaseEmail'),
     events = {
         's': 'BaseEmail.sent',
@@ -25,9 +26,9 @@ BaseEmail.init(function() {
     util.each(events, function(ref,name) {
         storage.stats.zeroCounter(name);
     });
-    storage.stats.zeroUniqueCounter('opened', 0.01, 10000000);
-    storage.stats.zeroUniqueCounter('clicked', 0.01, 10000000);
-    storage.stats.zeroUniqueCounter('unsubscribed', 0.01, 10000000);
+    storage.stats.zeroUniqueCounter('BaseEmail.opened', 0.01, 10000000);
+    storage.stats.zeroUniqueCounter('BaseEmail.clicked', 0.01, 10000000);
+    storage.stats.zeroUniqueCounter('BaseEmail.unsubscribed', 0.01, 10000000);
 });
 
 BaseEmail.load(function() {
@@ -100,15 +101,36 @@ BaseEmail.on('bounce.smtp', function() {
 });
 
 BaseEmail.on('open', function() {
-    // Should return an HTTP document with a blank image
+    // Should return an HTTP document with a blank image?
+    this.set('/status', '200 OK')
+        .set('/headers', {'Content-Type': 'image/gif'})
+        .set('/body', '\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\
+\xff\xff\xff\x00\x00\x00\x21\xf9\x04\x01\x00\x00\x00\x00\x2c\x00\x00\x00\x00\
+\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3b')
+        .applyFormat(http.format);
 });
 
 BaseEmail.on('click', function() {
     // Should return an HTTP document with a redirect to the click-through URL
+    var link = analytics.parseClickTrackingURL(this.request.path);
+    this.set('/status', '302 Found')
+        .set('/headers', {
+            'Content-Type': 'text/plain; charset="utf-8"',
+            'Location': link.destination || this.template.BaseEmail.baseURL
+        })
+        .set('/body', 'Location: ' + 
+            (link.destination || this.template.BaseEmail.baseURL))
+        .applyFormat(http.format);
 });
 
 BaseEmail.on('analytics', function() {
-    // Should return an HTTP document with a blank image
+    // Should return an HTTP document with a blank image?
+    this.set('/status', '200 OK')
+        .set('/headers', {'Content-Type': 'image/gif'})
+        .set('/body', '\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\
+\xff\xff\xff\x00\x00\x00\x21\xf9\x04\x01\x00\x00\x00\x00\x2c\x00\x00\x00\x00\
+\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3b')
+        .applyFormat(http.format);
 });
 
 BaseEmail.on('forward.smtp', function() {
