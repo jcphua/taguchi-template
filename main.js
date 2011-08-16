@@ -43,9 +43,7 @@ exports.define = function(name) {
                 "http": []
             },
             "bounce": { // used to indicate an error response
-                "*": [],
-                "smtp": [],
-                "sms": []
+                "*": []
             },
             "reply": { // used to indicate a human-originated response
                 "*": [],
@@ -63,16 +61,10 @@ exports.define = function(name) {
                 "*": []
             },
             "forward": { // indicates the message was sent to someone else
-                "*": [],
-                "smtp": [],
-                "sms": [],
-                "http": []
+                "*": []
             }, 
             "unsubscribe": {
-                "*": [],
-                "smtp": [],
-                "sms": [],
-                "http": []
+                "*": []
             },
             "report": {
                 "*": [],
@@ -355,7 +347,11 @@ exports.define = function(name) {
     };
     
     Response.prototype.applyHandlerFrom = function(module_or_module_name) {
-        return this;
+        var module_name = typeof module_or_module_name === "string" ? 
+                module_or_module_name : module_or_module_name.name,
+            handler = 
+                this.template.handlers[module_name][request.event.protocol];
+        return (handler.call(this) || this);
     };
     
     Response.prototype.applyFormat = function(format_fn) {

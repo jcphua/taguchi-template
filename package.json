@@ -13,6 +13,6 @@
         "url": "git://github.com/taguchimail/taguchi-template.git"
     }],
     "main"          : "main.js",
-    "version"       : "1.0dev10",
+    "version"       : "1.0alpha1",
     "engines"       : {"taguchi": ">=1.0dev1"}
 }

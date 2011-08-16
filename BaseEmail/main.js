@@ -42,7 +42,7 @@ BaseEmail.request(function(request, response) {
     if (!request.test && events[request.event.ref]) {
         storage.stats.incrementCounter(events[request.event.ref]);
         if (request.event.ref == 'o' || request.event.ref == 'c' || 
-                request.event.ref == 'v') {
+                request.event.ref == 'u') {
             storage.stats.updateUniqueCounter(events[request.event.ref],
                 request.event.parent.id);
         }
@@ -96,10 +96,6 @@ BaseEmail.on('view.http', function() {
         .applyFormat(http.format);
 });
 
-BaseEmail.on('bounce.smtp', function() {
-    // Nothing to do here
-});
-
 BaseEmail.on('open', function() {
     // Should return an HTTP document with a blank image?
     this.set('/status', '200 OK')
@@ -131,14 +127,6 @@ BaseEmail.on('analytics', function() {
 \xff\xff\xff\x00\x00\x00\x21\xf9\x04\x01\x00\x00\x00\x00\x2c\x00\x00\x00\x00\
 \x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3b')
         .applyFormat(http.format);
-});
-
-BaseEmail.on('forward.smtp', function() {
-    // Don't bother doing anything, forward requests are handled by triggers
-});
-
-BaseEmail.on('unsubscribe.http', function() {
-    // Don't bother doing anything, unsubscribes are handled by triggers
 });
 
 BaseEmail.on('report.html', function() {
