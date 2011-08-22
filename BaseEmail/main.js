@@ -109,7 +109,7 @@ BaseEmail.on('open', function(request, response) {
 
 BaseEmail.on('click', function(request, response) {
     // Should return an HTTP document with a redirect to the click-through URL
-    var link = analytics.parseClickTrackingURL(request.path);
+    var link = analytics.parseClickTrackingURL(request.get('/path'));
     // increment link click count
     storage.stats.incrementCounter('BaseEmail.clicked.' + link.linkId);
     response.set('/status', '302 Found')

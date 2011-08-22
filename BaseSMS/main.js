@@ -61,7 +61,7 @@ BaseSMS.on('send.sms', function(request, response) {
 
 BaseSMS.on('click', function(request, response) {
     // Should return an HTTP document with a redirect to the click-through URL
-    var link = analytics.parseClickTrackingURL(request.path);
+    var link = analytics.parseClickTrackingURL(request.get('/path'));
     response.set('/status', '302 Found')
             .set('/headers', {
                 'Content-Type': 'text/plain; charset="utf-8"',

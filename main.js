@@ -16,10 +16,15 @@ var util = require('util'), fs = require('fs'), path = require('path'),
 
 // Request object -- provides methods to interpret requests
 Request = function(template, context) {
+    this._request = context;
     this.protocol = context.protocol;
     this.event = context.event;
     this.subscriber = context.subscriber;
     this.test = context.test;
+};
+
+Request.prototype.get = function(jpath) {
+    return jsonpointer.get(this._request, jpath);
 };
 
 // Response object -- provides methods to construct & serialize output
@@ -369,10 +374,10 @@ exports.define = function(name) {
     // Clones the current context, and calls the appropriate handlers for the 
     // given event, with the template as 'this'.
     template.handleRequest = function(req) {
-        var i, l, h, handlers = this.handlers[evtmap[request.event.ref]],
+        var i, l, h, handlers = this.handlers[evtmap[req.event.ref]],
             request = new Request(this, req),
             response = new Response(this, request), 
-            proto = request.event.protocol;
+            proto = req.protocol;
         
         for (i = 0, l = this.ancestors.length; i < l; i++) {
             if (this.hooks.request[this.ancestors[i]]) {
