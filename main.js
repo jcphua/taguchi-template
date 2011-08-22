@@ -14,6 +14,69 @@ var util = require('util'), fs = require('fs'), path = require('path'),
         'r': 'reply', 'c': 'click', 'wa': 'analytics', 'f': 'forward', 
         'u': 'unsubscribe', 'rq': 'report'};
 
+// Request object -- provides methods to interpret requests
+Request = function(template, context) {
+    this.protocol = context.protocol;
+    this.event = context.event;
+    this.subscriber = context.subscriber;
+    this.test = context.test;
+};
+
+// Response object -- provides methods to construct & serialize output
+// data
+Response = function(template, request) {
+    this._response_content = '';
+    this._response = {};
+    this._template = template;
+    this._request  = request;
+};
+
+Response.prototype.set = function(jpath, value) {
+    value = typeof value === "function" ? 
+        value(jsonpointer.get(this._response, jpath)) : value;
+    jsonpointer.set(this._response, jpath, value);
+    return this;
+};
+
+Response.prototype.append = function(jpath, value) {
+    var obj = jsonpointer.get(this._response, jpath);
+    if (!obj) { // not defined yet, set to a single value array
+        jsonpointer.set(this._response, jpath, [value]);
+    } else if (obj.push === undefined) { // non-array type
+        jsonpointer.set(this._response, jpath, [obj, value]);
+    } else { // array type, just push the value
+        obj.push(value);
+    }
+    return this;
+};
+
+Response.prototype.get = function(jpath) {
+    return jsonpointer.get(this._response, jpath);
+};
+
+Response.prototype.clear = function(jpath) {
+    jsonpointer.set(this._response, jpath, undefined);
+    return this;
+};
+
+Response.prototype.applyHandlerFrom = function(module_or_module_name) {
+    var module_name = typeof module_or_module_name === "string" ? 
+            module_or_module_name : module_or_module_name.name,
+        proto = this._request.protocol,
+        handler = this._template.handlers[module_name][proto];
+    return (handler.call(this._template, this._request, this) || this);
+};
+
+Response.prototype.applyFormat = function(format_fn) {
+    this._response_content = format_fn(this._response);
+    return this;
+};
+
+Response.prototype.render = function(view_name, content) {
+    return this._template.render(view_name, content, this);
+};
+
+
 // Creates a new template with the specified name
 exports.define = function(name) {
     var template = {
@@ -303,70 +366,11 @@ exports.define = function(name) {
         }
     };
     
-    // Response object -- provides methods to construct & serialize output
-    // data
-    Response = function(template, request) {
-        this._response_content = '';
-        this._response = {};
-        this.template = template;
-        this.request = request;
-        this.subscriber = request.subscriber;
-        this.event = request.event;
-        this.revision = template.revision;
-        this.activity = template.activity;
-        this.campaign = template.campaign;
-        this.config = template.config;
-    };
-    
-    Response.prototype.set = function(jpath, value) {
-        value = typeof value === "function" ? 
-            value(jsonpointer.get(this._response, jpath)) : value;
-        jsonpointer.set(this._response, jpath, value);
-        return this;
-    };
-    
-    Response.prototype.append = function(jpath, value) {
-        var obj = jsonpointer.get(this._response, jpath);
-        if (!obj) { // not defined yet, set to a single value array
-            jsonpointer.set(this._response, jpath, [value]);
-        } else if (obj.push === undefined) { // non-array type
-            jsonpointer.set(this._response, jpath, [obj, value]);
-        } else { // array type, just push the value
-            obj.push(value);
-        }
-        return this;
-    };
-    
-    Response.prototype.get = function(jpath) {
-        return jsonpointer.get(this._response, jpath);
-    };
-    
-    Response.prototype.clear = function(jpath) {
-        jsonpointer.set(this._response, jpath, undefined);
-        return this;
-    };
-    
-    Response.prototype.applyHandlerFrom = function(module_or_module_name) {
-        var module_name = typeof module_or_module_name === "string" ? 
-                module_or_module_name : module_or_module_name.name,
-            handler = 
-                this.template.handlers[module_name][request.event.protocol];
-        return (handler.call(this) || this);
-    };
-    
-    Response.prototype.applyFormat = function(format_fn) {
-        this._response_content = format_fn(this._response);
-        return this;
-    };
-    
-    Response.prototype.render = function(view_name, content) {
-        return this.template.render(view_name, content, this);
-    };
-    
     // Clones the current context, and calls the appropriate handlers for the 
     // given event, with the template as 'this'.
-    template.handleRequest = function(request) {
+    template.handleRequest = function(req) {
         var i, l, h, handlers = this.handlers[evtmap[request.event.ref]],
+            request = new Request(this, req),
             response = new Response(this, request), 
             proto = request.event.protocol;
         
@@ -379,10 +383,10 @@ exports.define = function(name) {
         
         // call each handler function
         for (i = 0, h = (handlers['*'] || []), l = h.length; i < l; i++) {
-            response = h[i].call(response) || response;
+            response = h[i].call(this, request, response) || response;
         }
         for (i = 0, h = (handlers[proto] || []), l = h.length; i < l; i++) {
-            response = h[i].call(response) || response;
+            response = h[i].call(this, request, response) || response;
         }
         return response._response_content;
     };

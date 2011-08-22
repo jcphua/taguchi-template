@@ -45,51 +45,52 @@ BaseSMS.request(function(request, response) {
     }
 });
 
-BaseSMS.on('send.sms', function() {
+BaseSMS.on('send.sms', function(request, response) {
     // Create the response structure
-    this.set('/headers', {
-            'From': 'support@taguchimail.com',
-            'To': this.subscriber.email,
-            'Content-Type': 'text/plain; charset="utf-8"'
-        })
-        .set('/body', analytics.addRawClickTracking(
-                this.render('text', this.revision.content), 
-                this.template.BaseSMS.baseURL, this.event.id, 
-                this.subscriber.hash))
-        .applyFormat(http.format);
+    response.set('/headers', {
+                'From': 'support@taguchimail.com',
+                'To': request.subscriber.email,
+                'Content-Type': 'text/plain; charset="utf-8"'
+            })
+            .set('/body', analytics.addRawClickTracking(
+                response.render('text', this.revision.content), 
+                this.BaseSMS.baseURL, request.event.id, 
+                request.subscriber.hash))
+            .applyFormat(http.format);
 });
 
-BaseSMS.on('click', function() {
+BaseSMS.on('click', function(request, response) {
     // Should return an HTTP document with a redirect to the click-through URL
-    var link = analytics.parseClickTrackingURL(this.request.path);
-    this.set('/status', '302 Found')
-        .set('/headers', {
-            'Content-Type': 'text/plain; charset="utf-8"',
-            'Location': link.destination || this.template.BaseSMS.baseURL
-        })
-        .set('/body', 'Location: ' + 
-            (link.destination || this.template.BaseSMS.baseURL))
-        .applyFormat(http.format);
+    var link = analytics.parseClickTrackingURL(request.path);
+    response.set('/status', '302 Found')
+            .set('/headers', {
+                'Content-Type': 'text/plain; charset="utf-8"',
+                'Location': link.destination || this.BaseSMS.baseURL
+            })
+            .set('/body', 'Location: ' + 
+                (link.destination || this.BaseSMS.baseURL))
+            .applyFormat(http.format);
 });
 
-BaseSMS.on('analytics', function() {
+BaseSMS.on('analytics', function(request, response) {
     // Should return an HTTP document with a blank image?
-    this.set('/status', '200 OK')
-        .set('/headers', {'Content-Type': 'image/gif'})
-        .set('/body', '\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\
-\xff\xff\xff\x00\x00\x00\x21\xf9\x04\x01\x00\x00\x00\x00\x2c\x00\x00\x00\x00\
-\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3b')
-        .applyFormat(http.format);
+    response.set('/status', '200 OK')
+            .set('/headers', {'Content-Type': 'image/gif'})
+            .set('/body',
+'\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\xff\xff\xff\x00\x00\x00\
+\x21\xf9\x04\x01\x00\x00\x00\x00\x2c\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\
+\x02\x44\x01\x00\x3b')
+            .applyFormat(http.format);
 });
 
-BaseSMS.on('report.html', function() {
+BaseSMS.on('report.html', function(request, response) {
     // TODO
 });
 
-BaseSMS.on('report.tex', function() {
+BaseSMS.on('report.tex', function(request, response) {
     // TODO
 });
 
-BaseSMS.on('report.tsv', function() {
+BaseSMS.on('report.tsv', function(request, response) {
     // TODO
 });
