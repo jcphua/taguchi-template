@@ -19,16 +19,18 @@ var template = require('template'),
 
 module.exports = BaseSMS;
 
-BaseSMS.init(function() {
-    // Set up stats counters
-    util.each(events, function(ref,name) {
-        storage.stats.zeroCounter(name);
-    });
-    storage.stats.zeroUniqueCounter('BaseSMS.clicked', 0.01, 10000000);
-    storage.stats.zeroUniqueCounter('BaseSMS.unsubscribed', 0.01, 10000000);
-});
-
 BaseSMS.load(function() {
+    if (!storage.getItem('initialized')) {
+        // Set up stats counters
+        util.each(events, function(ref,name) {
+            storage.stats.zeroCounter(name);
+        });
+        storage.stats.zeroUniqueCounter('BaseSMS.clicked', 0.01, 10000000);
+        storage.stats.zeroUniqueCounter('BaseSMS.unsubscribed', 0.01, 
+            10000000);
+        storage.setItem('initialized');
+    }
+
     this.BaseSMS = {
         baseURL: 'http://' + this.config.hostname + '/'
     };
@@ -49,13 +51,13 @@ BaseSMS.on('send.sms', function(request, response) {
     // Create the response structure
     response.set('/headers', {
                 'From': 'support@taguchimail.com',
-                'To': request.subscriber.email,
+                'To': request.recipient.email,
                 'Content-Type': 'text/plain; charset="utf-8"'
             })
             .set('/body', analytics.addRawClickTracking(
-                response.render('text', this.revision.content), 
+                response.render('text', this.content), 
                 this.BaseSMS.baseURL, request.event.id, 
-                request.subscriber.hash))
+                request.recipient.hash))
             .applyFormat(http.format);
 });
 

@@ -17,15 +17,21 @@ var template = require('template'),
 module.exports = BaseWebPage;
 
 BaseWebPage.init(function() {
-    // Set up stats counters
-    util.each(events, function(ref,name) {
-        storage.stats.zeroCounter(name);
-    });
-    storage.stats.zeroUniqueCounter('BaseWebPage.clicked', 0.01, 10000000);
-    storage.stats.zeroUniqueCounter('BaseWebPage.viewed', 0.01, 10000000);
+    
 });
 
 BaseWebPage.load(function() {
+    if (!storage.getItem('initialized')) {
+        // Set up stats counters
+        util.each(events, function(ref,name) {
+            storage.stats.zeroCounter(name);
+        });
+        storage.stats.zeroUniqueCounter('BaseWebPage.clicked', 0.01, 
+            10000000);
+        storage.stats.zeroUniqueCounter('BaseWebPage.viewed', 0.01, 10000000);
+        storage.setItem('initialized');
+    }
+
     this.BaseWebPage = {
         baseURL: 'http://' + this.config.hostname + '/'
     };
@@ -46,7 +52,7 @@ BaseWebPage.on('view.http', function(request, response) {
     // Grab the HTML content, strip the content-transfer-encoding header, and
     // return that as an HTTP response
     response.set('/headers', {'Content-Type': 'text/plain; charset="utf-8"'})
-            .set('/body', response.render('html', this.revision.content))
+            .set('/body', response.render('html', this.content))
             .applyFormat(http.format);
 });
 

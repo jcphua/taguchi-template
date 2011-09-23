@@ -21,17 +21,20 @@ var template = require('template'),
 
 module.exports = BaseEmail;
 
-BaseEmail.init(function() {
-    // Set up stats counters
-    util.each(events, function(ref,name) {
-        storage.stats.zeroCounter(name);
-    });
-    storage.stats.zeroUniqueCounter('BaseEmail.opened', 0.01, 10000000);
-    storage.stats.zeroUniqueCounter('BaseEmail.clicked', 0.01, 10000000);
-    storage.stats.zeroUniqueCounter('BaseEmail.unsubscribed', 0.01, 10000000);
-});
-
 BaseEmail.load(function() {
+    if (!storage.getItem('initialized')) {
+        // Set up stats counters
+        util.each(events, function(ref,name) {
+            storage.stats.zeroCounter(name);
+            storage.stats.zeroTimeCounter(name, 'hour');
+        });
+        storage.stats.zeroUniqueCounter('BaseEmail.opened', 0.01, 10000000);
+        storage.stats.zeroUniqueCounter('BaseEmail.clicked', 0.01, 10000000);
+        storage.stats.zeroUniqueCounter('BaseEmail.unsubscribed', 0.01, 
+            10000000);
+        storage.setItem('initialized');
+    }
+
     this.BaseEmail = {
         baseURL: 'http://' + this.config.hostname + '/'
     };
@@ -41,6 +44,7 @@ BaseEmail.request(function(request, response) {
     // Update base email stats
     if (!request.test && events[request.event.ref]) {
         storage.stats.incrementCounter(events[request.event.ref]);
+        storage.stats.incrementTimeCounter(events[request.event.ref]);
         if (request.event.ref == 'o' || request.event.ref == 'c' || 
                 request.event.ref == 'u') {
             storage.stats.updateUniqueCounter(events[request.event.ref],
@@ -53,17 +57,17 @@ BaseEmail.on('send.smtp', function(request, response) {
     // Create the response structure
     response.set('/headers', {
                 'Return-Path': '<' + this.config.instance + '.' + 
-                    request.event.id + '.' + request.subscriber.hash + 
-                    '@clients.taguchimail.com',
+                    request.event.id + '.' + request.recipient.hash + 
+                    '@clients.taguchimail.com>',
                 'From': 'support@taguchimail.com',
                 'Precedence': 'list',
-                'To': request.subscriber.email,
-                'Subject': this.revision.content.subject,
+                'To': request.recipient.email,
+                'Subject': this.content.subject,
                 'MIME-Version': '1.0',
                 'Content-Type': 'multipart/alternative',
                 'Content-Transfer-Encoding': '8bit'
             })
-            .set('/boundary', mime.boundary(0, request.subscriber.hash))
+            .set('/boundary', mime.boundary(0, request.recipient.hash))
             .set('/body', 'This is a multi-part message in MIME format')
             .append('/subparts', {
                 headers: {
@@ -71,9 +75,9 @@ BaseEmail.on('send.smtp', function(request, response) {
                     'Content-Transfer-Encoding': '8bit'
                 },
                 body: analytics.addRawClickTracking(
-                    response.render('text', this.revision.content), 
+                    response.render('text', this.content), 
                     this.BaseEmail.baseURL, request.event.id, 
-                    request.subscriber.hash)
+                    request.recipient.hash)
             })
             .append('/subparts', {
                 headers: {
@@ -81,9 +85,9 @@ BaseEmail.on('send.smtp', function(request, response) {
                     'Content-Transfer-Encoding': '8bit'
                 },
                 body: analytics.addHTMLClickTracking(
-                    response.render('html', this.revision.content), 
+                    response.render('html', this.content), 
                     this.BaseEmail.baseURL, request.event.id, 
-                    request.subscriber.hash)
+                    request.recipient.hash)
             })
             .applyFormat(mime.format);
 });
@@ -92,7 +96,7 @@ BaseEmail.on('view.http', function(request, response) {
     // Grab the HTML content, strip the content-transfer-encoding header, and
     // return that as an HTTP response
     response.set('/headers', {'Content-Type': 'text/plain; charset="utf-8"'})
-            .set('/body', response.render('html', this.revision.content))
+            .set('/body', response.render('html', this.content))
             .applyFormat(http.format);
 });
 
