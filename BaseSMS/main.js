@@ -38,11 +38,11 @@ BaseSMS.load(function() {
 
 BaseSMS.request(function(request, response) {
     // Update base email stats
-    if (!request.test && events[request.event.ref]) {
-        storage.stats.incrementCounter(events[request.event.ref]);
-        if (request.event.ref == 'c' || request.event.ref == 'u') {
-            storage.stats.updateUniqueCounter(events[request.event.ref],
-                request.event.parent.id);
+    if (!request.test && events[request.ref]) {
+        storage.stats.incrementCounter(events[request.ref]);
+        if (request.ref == 'c' || request.ref == 'u') {
+            storage.stats.updateUniqueCounter(events[request.ref],
+                request.parent.id);
         }
     }
 });
@@ -56,7 +56,7 @@ BaseSMS.on('send.sms', function(request, response) {
             })
             .set('/body', analytics.addRawClickTracking(
                 response.render('text', this.content), 
-                this.BaseSMS.baseURL, request.event.id, 
+                this.BaseSMS.baseURL, request.id, 
                 request.recipient.hash))
             .applyFormat(http.format);
 });

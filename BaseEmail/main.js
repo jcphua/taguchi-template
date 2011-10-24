@@ -42,13 +42,13 @@ BaseEmail.load(function() {
 
 BaseEmail.request(function(request, response) {
     // Update base email stats
-    if (!request.test && events[request.event.ref]) {
-        storage.stats.incrementCounter(events[request.event.ref]);
-        storage.stats.incrementTimeCounter(events[request.event.ref]);
-        if (request.event.ref == 'o' || request.event.ref == 'c' || 
-                request.event.ref == 'u') {
-            storage.stats.updateUniqueCounter(events[request.event.ref],
-                request.event.parent.id);
+    if (!request.test && events[request.ref]) {
+        storage.stats.incrementCounter(events[request.ref]);
+        storage.stats.incrementTimeCounter(events[request.ref]);
+        if (request.ref == 'o' || request.ref == 'c' || 
+                request.ref == 'u') {
+            storage.stats.updateUniqueCounter(events[request.ref],
+                request.parent.id);
         }
     }
 });
@@ -57,7 +57,7 @@ BaseEmail.on('send.smtp', function(request, response) {
     // Create the response structure
     response.set('/headers', {
                 'Return-Path': '<' + this.config.instance + '.' + 
-                    request.event.id + '.' + request.recipient.hash + 
+                    request.id + '.' + request.recipient.hash + 
                     '@clients.taguchimail.com>',
                 'From': 'support@taguchimail.com',
                 'Precedence': 'list',
@@ -76,7 +76,7 @@ BaseEmail.on('send.smtp', function(request, response) {
                 },
                 body: analytics.addRawClickTracking(
                     response.render('text', this.content), 
-                    this.BaseEmail.baseURL, request.event.id, 
+                    this.BaseEmail.baseURL, request.id, 
                     request.recipient.hash)
             })
             .append('/subparts', {
@@ -86,7 +86,7 @@ BaseEmail.on('send.smtp', function(request, response) {
                 },
                 body: analytics.addHTMLClickTracking(
                     response.render('html', this.content), 
-                    this.BaseEmail.baseURL, request.event.id, 
+                    this.BaseEmail.baseURL, request.id, 
                     request.recipient.hash)
             })
             .applyFormat(mime.format);

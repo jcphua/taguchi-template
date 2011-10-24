@@ -39,11 +39,11 @@ BaseWebPage.load(function() {
 
 BaseWebPage.request(function(request, response) {
     // Update base email stats
-    if (!request.test && events[request.event.ref]) {
-        storage.stats.incrementCounter(events[request.event.ref]);
-        if (request.event.ref == 'v' || request.event.ref == 'c') {
-            storage.stats.updateUniqueCounter(events[request.event.ref],
-                request.event.parent.id);
+    if (!request.test && events[request.ref]) {
+        storage.stats.incrementCounter(events[request.ref]);
+        if (request.ref == 'v' || request.ref == 'c') {
+            storage.stats.updateUniqueCounter(events[request.ref],
+                request.parent.id);
         }
     }
 });

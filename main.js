@@ -21,10 +21,10 @@ var util = require('util'), fs = require('fs'), path = require('path'),
 Request = function(template, context) {
     this._request = context;
     this.protocol = context.protocol;
-    this.event = context.event;
     this.recipient = context.recipient;
     this.test = context.test;
-    this.id = context.event.id;
+    this.id = context.id;
+    this.ref = context.ref;
 };
 
 Request.prototype.get = function(jpath) {
@@ -338,7 +338,7 @@ exports.define = function(name) {
                 return response.render(view_name, content);
             };
 
-        if (this._visible_views[view_name] === undefined) {
+        if (fn === undefined) {
             fn = jsonpointer.get(this.views, view_name);
         }
 
@@ -360,26 +360,38 @@ exports.define = function(name) {
     // Clones the current context, and calls the appropriate handlers for the
     // given event, with the template as 'this'.
     template.handleRequest = function(req) {
-        var i, l, h, handlers = this.handlers[evtmap[req.event.ref]],
-            request = new Request(this, req),
-            response = new Response(this, request),
-            proto = req.protocol;
+        var i, l, h, ir, lr, handlers, request, response, proto, results = [];
 
-        for (i = 0, l = this.ancestors.length; i < l; i++) {
-            if (this.hooks.request[this.ancestors[i]]) {
-                this.hooks.request[this.ancestors[i]].call(this, request,
-                    response);
+        if (!req.length) {
+            req = [req];
+        }
+
+        for (ir = 0, lr = req.length; ir < lr; ir++) {
+            handlers = this.handlers[evtmap[req[ir].ref]];
+            request = new Request(this, req[ir]);
+            response = new Response(this, request);
+            proto = req[ir].protocol;
+
+            for (i = 0, l = this.ancestors.length; i < l; i++) {
+                if (this.hooks.request[this.ancestors[i]]) {
+                    this.hooks.request[this.ancestors[i]].call(this, request,
+                        response);
+                }
             }
+
+            // call each handler function
+            h = handlers['*'] || [];
+            for (i = 0, l = h.length; i < l; i++) {
+                response = h[i].call(this, request, response) || response;
+            }
+            h = handlers[proto] || [];
+            for (i = 0, l = h.length; i < l; i++) {
+                response = h[i].call(this, request, response) || response;
+            }
+            results.push(response._response_content);
         }
 
-        // call each handler function
-        for (i = 0, h = (handlers['*'] || []), l = h.length; i < l; i++) {
-            response = h[i].call(this, request, response) || response;
-        }
-        for (i = 0, h = (handlers[proto] || []), l = h.length; i < l; i++) {
-            response = h[i].call(this, request, response) || response;
-        }
-        return response._response_content;
+        return results;        
     };
 
     template._loadOwnViews();
