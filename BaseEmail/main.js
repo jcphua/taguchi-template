@@ -32,7 +32,7 @@ BaseEmail.load(function() {
         storage.stats.zeroUniqueCounter('BaseEmail.clicked', 0.01, 10000000);
         storage.stats.zeroUniqueCounter('BaseEmail.unsubscribed', 0.01, 
             10000000);
-        storage.setItem('initialized');
+        storage.setItem('initialized', true);
     }
 
     this.BaseEmail = {
