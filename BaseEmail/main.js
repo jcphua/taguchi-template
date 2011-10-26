@@ -76,8 +76,8 @@ BaseEmail.on('send.smtp', function(request, response) {
                 },
                 body: analytics.addRawClickTracking(
                     response.render('text', this.content), 
-                    this.BaseEmail.baseURL, request.id, 
-                    request.recipient.hash)
+                    this.BaseEmail.baseURL, this.config.message_id, 
+                    request.id, request.recipient.hash)
             })
             .append('/subparts', {
                 headers: {
@@ -86,8 +86,8 @@ BaseEmail.on('send.smtp', function(request, response) {
                 },
                 body: analytics.addHTMLClickTracking(
                     response.render('html', this.content), 
-                    this.BaseEmail.baseURL, request.id, 
-                    request.recipient.hash)
+                    this.BaseEmail.baseURL, this.config.message_id, 
+                    request.id, request.recipient.hash)
             })
             .applyFormat(mime.format);
 });
