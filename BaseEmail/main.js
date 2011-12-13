@@ -30,7 +30,7 @@ BaseEmail.load(function() {
         });
         storage.stats.zeroUniqueCounter('BaseEmail.opened', 0.01, 10000000);
         storage.stats.zeroUniqueCounter('BaseEmail.clicked', 0.01, 10000000);
-        storage.stats.zeroUniqueCounter('BaseEmail.unsubscribed', 0.01, 
+        storage.stats.zeroUniqueCounter('BaseEmail.unsubscribed', 0.01,
             10000000);
         storage.setItem('initialized', true);
     }
@@ -45,7 +45,7 @@ BaseEmail.request(function(request, response) {
     if (!request.test && events[request.ref]) {
         storage.stats.incrementCounter(events[request.ref]);
         storage.stats.incrementTimeCounter(events[request.ref]);
-        if (request.ref == 'o' || request.ref == 'c' || 
+        if (request.ref == 'o' || request.ref == 'c' ||
                 request.ref == 'u') {
             storage.stats.updateUniqueCounter(events[request.ref],
                 request.parent.id);
@@ -56,8 +56,8 @@ BaseEmail.request(function(request, response) {
 BaseEmail.on('send.smtp', function(request, response) {
     // Create the response structure
     response.set('/headers', {
-                'Return-Path': '<' + this.config.instance + '.' + 
-                    request.id + '.' + request.recipient.hash + 
+                'Return-Path': '<' + this.config.instance + '.' +
+                    request.id + '.' + request.recipient.hash +
                     '@clients.taguchimail.com>',
                 'From': 'support@taguchimail.com',
                 'Precedence': 'list',
@@ -75,8 +75,8 @@ BaseEmail.on('send.smtp', function(request, response) {
                     'Content-Transfer-Encoding': '8bit'
                 },
                 body: analytics.addRawClickTracking(
-                    response.render('text', this.content), 
-                    this.BaseEmail.baseURL, this.config.message_id, 
+                    response.render('text', this.content),
+                    this.BaseEmail.baseURL, this.config.messageId,
                     request.id, request.recipient.hash)
             })
             .append('/subparts', {
@@ -85,8 +85,8 @@ BaseEmail.on('send.smtp', function(request, response) {
                     'Content-Transfer-Encoding': '8bit'
                 },
                 body: analytics.addHTMLClickTracking(
-                    response.render('html', this.content), 
-                    this.BaseEmail.baseURL, this.config.message_id, 
+                    response.render('html', this.content),
+                    this.BaseEmail.baseURL, this.config.messageId,
                     request.id, request.recipient.hash)
             })
             .applyFormat(mime.format);
@@ -121,7 +121,7 @@ BaseEmail.on('click', function(request, response) {
                 'Content-Type': 'text/plain; charset="utf-8"',
                 'Location': link.destination || this.BaseEmail.baseURL
             })
-            .set('/body', 'Location: ' + 
+            .set('/body', 'Location: ' +
                 (link.destination || this.BaseEmail.baseURL))
             .applyFormat(http.format);
 });

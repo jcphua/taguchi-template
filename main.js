@@ -12,10 +12,7 @@ var util = require('util'), fs = require('fs'), path = require('path'),
     view = require('./view'), stats = require('taguchi/storage'),
     analytics = require('taguchi/analytics'),
     storage = require('taguchi/storage'),
-    jsonpointer = require('./jsonpointer'),
-    evtmap = {'s': 'send', 'o': 'open', 'v': 'view', 'b': 'bounce',
-        'r': 'reply', 'c': 'click', 'wa': 'analytics', 'f': 'forward',
-        'u': 'unsubscribe', 'rq': 'report'};
+    jsonpointer = require('./jsonpointer');
 
 // Request object -- provides methods to interpret requests
 Request = function(template, context) {
@@ -347,12 +344,12 @@ exports.define = function(name) {
         if (content.length !== undefined) {
             str = '';
             for (i = 0, l = content.length; i < l; i++) {
-                str += fn.call(content[i], this, response._request, 
+                str += fn.call(content[i], this, response._request,
                         jsonpointer, analytics, util, render_fn, i, content);
             }
             return str;
         } else {
-            return fn.call(content, this, response._request, jsonpointer, 
+            return fn.call(content, this, response._request, jsonpointer,
                         analytics, util, render_fn, 0, [content]);
         }
     };
@@ -360,14 +357,21 @@ exports.define = function(name) {
     // Clones the current context, and calls the appropriate handlers for the
     // given event, with the template as 'this'.
     template.handleRequest = function(req) {
-        var i, l, h, ir, lr, handlers, request, response, proto, results = [];
+        var i, l, h, ir, lr, handlers, request, response, proto, results = [],
+            response_data;
 
         if (!req.length) {
             req = [req];
         }
 
         for (ir = 0, lr = req.length; ir < lr; ir++) {
-            handlers = this.handlers[evtmap[req[ir].ref]];
+            handlers = this.handlers[req[ir].ref];
+            if (!handlers) {
+                console.error("Couldn't process request ", ir,
+                    ": no handlers for event ref '", req[ir].ref, "'");
+                continue;
+            }
+
             request = new Request(this, req[ir]);
             response = new Response(this, request);
             proto = req[ir].protocol;
@@ -388,10 +392,17 @@ exports.define = function(name) {
             for (i = 0, l = h.length; i < l; i++) {
                 response = h[i].call(this, request, response) || response;
             }
-            results.push(response._response_content);
+
+            // output response content and response data
+            response_data = response._response.data || {};
+            response_data.id = request.id
+            results.push({
+                content: response._response_content,
+                data: response_data
+            });
         }
 
-        return results;        
+        return results;
     };
 
     template._loadOwnViews();
