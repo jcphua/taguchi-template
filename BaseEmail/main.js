@@ -9,14 +9,14 @@ var template = require('template'),
     http = require('http'),
     BaseEmail = template.define('BaseEmail'),
     events = {
-        's': 'BaseEmail.sent',
-        'b': 'BaseEmail.bounced',
-        'o': 'BaseEmail.opened',
-        'c': 'BaseEmail.clicked',
-        'u': 'BaseEmail.unsubscribed',
-        'v': 'BaseEmail.viewed',
-        'f': 'BaseEmail.forwarded',
-        'wa': 'BaseEmail.analytics',
+        'send': 'BaseEmail.send',
+        'bounce': 'BaseEmail.bounce',
+        'open': 'BaseEmail.open',
+        'click': 'BaseEmail.click',
+        'unsubscribe': 'BaseEmail.unsubscribe',
+        'view': 'BaseEmail.view',
+        'forward': 'BaseEmail.forward',
+        'analytics': 'BaseEmail.analytics',
     };
 
 module.exports = BaseEmail;
@@ -28,9 +28,9 @@ BaseEmail.load(function() {
             storage.stats.zeroCounter(name);
             storage.stats.zeroTimeCounter(name, 'hour');
         });
-        storage.stats.zeroUniqueCounter('BaseEmail.opened', 0.01, 10000000);
-        storage.stats.zeroUniqueCounter('BaseEmail.clicked', 0.01, 10000000);
-        storage.stats.zeroUniqueCounter('BaseEmail.unsubscribed', 0.01,
+        storage.stats.zeroUniqueCounter('BaseEmail.open', 0.01, 10000000);
+        storage.stats.zeroUniqueCounter('BaseEmail.click', 0.01, 10000000);
+        storage.stats.zeroUniqueCounter('BaseEmail.unsubscribe', 0.01,
             10000000);
         storage.setItem('initialized', true);
     }
@@ -76,7 +76,7 @@ BaseEmail.on('send.smtp', function(request, response) {
                 },
                 body: analytics.addRawClickTracking(
                     response.render('text', this.content),
-                    this.BaseEmail.baseURL, this.config.messageId,
+                    this.BaseEmail.baseURL, this.messageId,
                     request.id, request.recipient.hash)
             })
             .append('/subparts', {
@@ -86,7 +86,7 @@ BaseEmail.on('send.smtp', function(request, response) {
                 },
                 body: analytics.addHTMLClickTracking(
                     response.render('html', this.content),
-                    this.BaseEmail.baseURL, this.config.messageId,
+                    this.BaseEmail.baseURL, this.messageId,
                     request.id, request.recipient.hash)
             })
             .applyFormat(mime.format);

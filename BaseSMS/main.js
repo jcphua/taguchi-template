@@ -9,12 +9,12 @@ var template = require('template'),
     http = require('http'),
     BaseSMS = template.define('BaseSMS'),
     events = {
-        's': 'BaseSMS.sent',
-        'b': 'BaseSMS.bounced',
-        'c': 'BaseSMS.clicked',
-        'u': 'BaseSMS.unsubscribed',
-        'f': 'BaseSMS.forwarded',
-        'wa': 'BaseSMS.analytics',
+        'send': 'BaseSMS.send',
+        'bounce': 'BaseSMS.bounce',
+        'click': 'BaseSMS.click',
+        'unsubscribe': 'BaseSMS.unsubscribe',
+        'forward': 'BaseSMS.forward',
+        'analytics': 'BaseSMS.analytics',
     };
 
 module.exports = BaseSMS;
@@ -25,8 +25,8 @@ BaseSMS.load(function() {
         util.each(events, function(ref,name) {
             storage.stats.zeroCounter(name);
         });
-        storage.stats.zeroUniqueCounter('BaseSMS.clicked', 0.01, 10000000);
-        storage.stats.zeroUniqueCounter('BaseSMS.unsubscribed', 0.01, 
+        storage.stats.zeroUniqueCounter('BaseSMS.click', 0.01, 10000000);
+        storage.stats.zeroUniqueCounter('BaseSMS.unsubscribe', 0.01,
             10000000);
         storage.setItem('initialized');
     }
@@ -55,8 +55,8 @@ BaseSMS.on('send.sms', function(request, response) {
                 'Content-Type': 'text/plain; charset="utf-8"'
             })
             .set('/body', analytics.addRawClickTracking(
-                response.render('text', this.content), 
-                this.BaseSMS.baseURL, request.id, 
+                response.render('text', this.content),
+                this.BaseSMS.baseURL, request.id,
                 request.recipient.hash))
             .applyFormat(http.format);
 });
@@ -69,7 +69,7 @@ BaseSMS.on('click', function(request, response) {
                 'Content-Type': 'text/plain; charset="utf-8"',
                 'Location': link.destination || this.BaseSMS.baseURL
             })
-            .set('/body', 'Location: ' + 
+            .set('/body', 'Location: ' +
                 (link.destination || this.BaseSMS.baseURL))
             .applyFormat(http.format);
 });

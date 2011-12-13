@@ -207,6 +207,8 @@ exports.define = function(name) {
         // Set up message and request content
         this.config = storage.getItem('config') || {};
         this.content = storage.getItem('content') || {};
+        this.messageId = storage.getItem('messageId');
+        this.accountId = storage.getItem('accountId');
 
         // Work out mapping of currently-visible views -- try to find the view
         // in the descendant template, then each template in the inheritance

@@ -9,15 +9,15 @@ var template = require('template'),
     http = require('http'),
     BaseWebPage = template.define('BaseWebPage'),
     events = {
-        'c': 'BaseWebPage.clicked',
-        'v': 'BaseWebPage.viewed',
-        'wa': 'BaseWebPage.analytics',
+        'click': 'BaseWebPage.click',
+        'view': 'BaseWebPage.view',
+        'analytics': 'BaseWebPage.analytics',
     };
 
 module.exports = BaseWebPage;
 
 BaseWebPage.init(function() {
-    
+
 });
 
 BaseWebPage.load(function() {
@@ -26,9 +26,9 @@ BaseWebPage.load(function() {
         util.each(events, function(ref,name) {
             storage.stats.zeroCounter(name);
         });
-        storage.stats.zeroUniqueCounter('BaseWebPage.clicked', 0.01, 
+        storage.stats.zeroUniqueCounter('BaseWebPage.click', 0.01,
             10000000);
-        storage.stats.zeroUniqueCounter('BaseWebPage.viewed', 0.01, 10000000);
+        storage.stats.zeroUniqueCounter('BaseWebPage.view', 0.01, 10000000);
         storage.setItem('initialized');
     }
 
@@ -64,7 +64,7 @@ BaseWebPage.on('click', function(request, response) {
                 'Content-Type': 'text/plain; charset="utf-8"',
                 'Location': link.destination || this.BaseWebPage.baseURL
             })
-            .set('/body', 'Location: ' + 
+            .set('/body', 'Location: ' +
                 (link.destination || this.BaseWebPage.baseURL))
             .applyFormat(http.format);
 });
