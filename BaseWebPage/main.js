@@ -2,8 +2,8 @@
 
 var template = require('template'),
     view = require('../view'),
-    storage = require('taguchi/storage'),
-    analytics = require('taguchi/analytics'),
+    storage = require('mimeformat/storage'),
+    analytics = require('mimeformat/analytics'),
     util = require('util'),
     mime = require('mime'),
     http = require('http'),

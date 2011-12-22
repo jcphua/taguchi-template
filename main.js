@@ -9,9 +9,9 @@ function view_to_fn(_view_fn) {
 }
 
 var util = require('util'), fs = require('fs'), path = require('path'),
-    view = require('./view'), stats = require('taguchi/storage'),
-    analytics = require('taguchi/analytics'),
-    storage = require('taguchi/storage'),
+    view = require('./view'),
+    analytics = require('mimeformat/analytics'),
+    storage = require('mimeformat/storage'),
     jsonpointer = require('./jsonpointer');
 
 // Request object -- provides methods to interpret requests
