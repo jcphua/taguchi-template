@@ -25,9 +25,9 @@ BaseSMS.load(function() {
         util.each(events, function(ref,name) {
             storage.stats.zeroCounter(name);
         });
-        storage.stats.zeroUniqueCounter('BaseSMS.click', 0.01, 10000000);
-        storage.stats.zeroUniqueCounter('BaseSMS.unsubscribe', 0.01,
-            10000000);
+        storage.stats.zeroUniqueCounter('BaseSMS.click', 1/256, 104857600);
+        storage.stats.zeroUniqueCounter('BaseSMS.unsubscribe', 1/256,
+            104857600);
         storage.setItem('initialized');
     }
 

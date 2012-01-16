@@ -28,10 +28,10 @@ BaseEmail.load(function() {
             storage.stats.zeroCounter(name);
             storage.stats.zeroTimeCounter(name, 'hour');
         });
-        storage.stats.zeroUniqueCounter('BaseEmail.open', 0.01, 10000000);
-        storage.stats.zeroUniqueCounter('BaseEmail.click', 0.01, 10000000);
-        storage.stats.zeroUniqueCounter('BaseEmail.unsubscribe', 0.01,
-            10000000);
+        storage.stats.zeroUniqueCounter('BaseEmail.open', 1/256, 104857600);
+        storage.stats.zeroUniqueCounter('BaseEmail.click', 1/256, 104857600);
+        storage.stats.zeroUniqueCounter('BaseEmail.unsubscribe', 1/256,
+            104857600);
         storage.setItem('initialized', true);
     }
 

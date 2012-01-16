@@ -19,7 +19,7 @@ exports.get = function(obj, pointer) {
 
 exports.set = function(obj, pointer, value) {
     if (pointer === "/") {
-        return obj;
+        throw "Can't set the root object";
     }
     pointer = pointer.split("/").slice(1);
     var result, key, i, l;

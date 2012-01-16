@@ -4,15 +4,15 @@
     "homepage"      : "https://github.com/taguchimail/taguchi-template",
     "keywords"      : [],
     "author"        : "TaguchiMarketing Pty Ltd",
-    "dependencies"  : {"hash": ">=1.0dev1", "util": ">=1.0dev1", 
+    "dependencies"  : {"hash": ">=1.0dev1", "util": ">=1.0dev1",
                         "mime": ">=1.0dev1", "http": ">=1.0dev1",
                         "fs": ">=1.0dev1", "path": ">=1.0dev1",
-                        "taguchi": ">=1.0dev1"},
+                        "mimeformat": ">=1.0dev1"},
     "repositories"  : [{
-        "type": "git", 
+        "type": "git",
         "url": "git://github.com/taguchimail/taguchi-template.git"
     }],
     "main"          : "main.js",
     "version"       : "1.0alpha1",
-    "engines"       : {"taguchi": ">=1.0dev1"}
+    "engines"       : {"mimeformat": ">=1.0dev1"}
 }

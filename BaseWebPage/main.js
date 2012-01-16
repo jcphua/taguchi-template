@@ -26,9 +26,9 @@ BaseWebPage.load(function() {
         util.each(events, function(ref,name) {
             storage.stats.zeroCounter(name);
         });
-        storage.stats.zeroUniqueCounter('BaseWebPage.click', 0.01,
-            10000000);
-        storage.stats.zeroUniqueCounter('BaseWebPage.view', 0.01, 10000000);
+        storage.stats.zeroUniqueCounter('BaseWebPage.click', 1/256,
+            104857600);
+        storage.stats.zeroUniqueCounter('BaseWebPage.view', 1/256, 104857600);
         storage.setItem('initialized');
     }
 
