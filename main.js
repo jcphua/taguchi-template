@@ -366,7 +366,7 @@ exports.define = function(name) {
     // given event, with the template as 'this'.
     template.handleRequest = function(req) {
         var i, l, h, ir, lr, handlers, request, response, proto, results = [],
-            response_data;
+            result;
 
         if (!req.length) {
             req = [req];
@@ -384,6 +384,7 @@ exports.define = function(name) {
             response = new Response(this, request);
             proto = req[ir].protocol;
 
+            // run request hook
             for (i = 0, l = this.ancestors.length; i < l; i++) {
                 if (this.hooks.request[this.ancestors[i]]) {
                     this.hooks.request[this.ancestors[i]].call(this, request,
@@ -401,6 +402,7 @@ exports.define = function(name) {
                 response = h[i].call(this, request, response) || response;
             }
 
+            // run output hook
             for (i = 0, l = this.ancestors.length; i < l; i++) {
                 if (this.hooks.output[this.ancestors[i]]) {
                     this.hooks.output[this.ancestors[i]].call(this, request,
@@ -409,12 +411,17 @@ exports.define = function(name) {
             }
 
             // output response content and response data
-            response_data = response._response.data || {};
-            response_data.id = request.id
-            results.push({
+            result = {
                 content: response._response_content,
-                data: response_data
-            });
+                data: response._response.data || {}
+            };
+            result.data.id = request.id;
+
+            if (request.test) {
+                // include some debugging output
+                result.debug = response._response;
+            }
+            results.push(result);
         }
 
         return results;
