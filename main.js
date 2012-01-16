@@ -104,6 +104,7 @@ exports.define = function(name) {
             // only single-level
             "load": {},
             "request": {},
+            "output": {}
         },
         handlers: {
             // These handlers are protocol-oriented. Wildcard handlers ('*')
@@ -317,6 +318,11 @@ exports.define = function(name) {
         this.hooks.request[this.name] = callback;
     };
 
+    // Register an output hook
+    template.output = function(callback) {
+        this.hooks.output[this.name] = callback;
+    };
+
     // Call the load hook
     template.doLoad = function() {
         var i, l;
@@ -393,6 +399,13 @@ exports.define = function(name) {
             h = handlers[proto] || [];
             for (i = 0, l = h.length; i < l; i++) {
                 response = h[i].call(this, request, response) || response;
+            }
+
+            for (i = 0, l = this.ancestors.length; i < l; i++) {
+                if (this.hooks.output[this.ancestors[i]]) {
+                    this.hooks.output[this.ancestors[i]].call(this, request,
+                        response);
+                }
             }
 
             // output response content and response data

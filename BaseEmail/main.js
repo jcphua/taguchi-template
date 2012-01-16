@@ -58,8 +58,8 @@ BaseEmail.on('send.smtp', function(request, response) {
     var mail_from = '<' + this.config.instance + '.' + request.id + '.' +
             request.recipient.hash + '@clients.taguchimail.com>';
     response.set('/data', {
-                mail_from: mail_from,
-                rcpt_to: request.recipient.email
+                'mail_from': mail_from,
+                'rcpt_to': request.recipient.email
             })
             .set('/headers', {
                 'Return-Path': mail_from,
