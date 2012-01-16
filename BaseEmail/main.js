@@ -55,10 +55,14 @@ BaseEmail.request(function(request, response) {
 
 BaseEmail.on('send.smtp', function(request, response) {
     // Create the response structure
-    response.set('/headers', {
-                'Return-Path': '<' + this.config.instance + '.' +
-                    request.id + '.' + request.recipient.hash +
-                    '@clients.taguchimail.com>',
+    var mail_from = '<' + this.config.instance + '.' + request.id + '.' +
+            request.recipient.hash + '@clients.taguchimail.com>';
+    response.set('/data', {
+                mail_from: mail_from,
+                rcpt_to: request.recipient.email
+            })
+            .set('/headers', {
+                'Return-Path': mail_from,
                 'From': 'support@taguchimail.com',
                 'Precedence': 'list',
                 'To': request.recipient.email,
