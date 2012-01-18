@@ -55,8 +55,8 @@ BaseEmail.request(function(request, response) {
 
 BaseEmail.on('send.smtp', function(request, response) {
     // Create the response structure
-    var mail_from = '<' + this.config.instance + '.' + request.id + '.' +
-            request.recipient.hash + '@clients.taguchimail.com>';
+    var mail_from = this.config.instance + '.' + request.id + '.' +
+            request.recipient.hash + '@clients.taguchimail.com';
     response.set('/data', {
                 'mail_from': mail_from,
                 'rcpt_to': request.recipient.email
