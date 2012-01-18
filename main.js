@@ -380,48 +380,56 @@ exports.define = function(name) {
                 continue;
             }
 
-            request = new Request(this, req[ir]);
-            response = new Response(this, request);
-            proto = req[ir].protocol;
+            try {
+                request = new Request(this, req[ir]);
+                response = new Response(this, request);
+                proto = req[ir].protocol;
 
-            // run request hook
-            for (i = 0, l = this.ancestors.length; i < l; i++) {
-                if (this.hooks.request[this.ancestors[i]]) {
-                    this.hooks.request[this.ancestors[i]].call(this, request,
-                        response);
+                // run request hook
+                for (i = 0, l = this.ancestors.length; i < l; i++) {
+                    if (this.hooks.request[this.ancestors[i]]) {
+                        this.hooks.request[this.ancestors[i]].call(this,
+                            request, response);
+                    }
                 }
-            }
 
-            // call each handler function
-            h = handlers['*'] || [];
-            for (i = 0, l = h.length; i < l; i++) {
-                response = h[i].call(this, request, response) || response;
-            }
-            h = handlers[proto] || [];
-            for (i = 0, l = h.length; i < l; i++) {
-                response = h[i].call(this, request, response) || response;
-            }
-
-            // run output hook
-            for (i = 0, l = this.ancestors.length; i < l; i++) {
-                if (this.hooks.output[this.ancestors[i]]) {
-                    this.hooks.output[this.ancestors[i]].call(this, request,
-                        response);
+                // call each handler function
+                h = handlers['*'] || [];
+                for (i = 0, l = h.length; i < l; i++) {
+                    response = h[i].call(this, request, response) || response;
                 }
-            }
+                h = handlers[proto] || [];
+                for (i = 0, l = h.length; i < l; i++) {
+                    response = h[i].call(this, request, response) || response;
+                }
 
-            // output response content and response data
-            result = {
-                content: response._response_content,
-                data: response._response.data || {}
-            };
-            result.data.id = request.id;
+                // run output hook
+                for (i = 0, l = this.ancestors.length; i < l; i++) {
+                    if (this.hooks.output[this.ancestors[i]]) {
+                        this.hooks.output[this.ancestors[i]].call(this,
+                            request, response);
+                    }
+                }
 
-            if (request.test) {
-                // include some debugging output
-                result.debug = response._response;
+                // output response content and response data
+                result = {
+                    content: response._response_content,
+                    data: response._response.data || {}
+                };
+                result.data.id = request.id;
+
+                if (request.test) {
+                    // include some debugging output
+                    result.debug = response._response;
+                }
+                results.push(result);
+            } catch (e) {
+                results.push({
+                    data: {id: req[ir].id},
+                    content: null,
+                    error: e.toString()
+                });
             }
-            results.push(result);
         }
 
         return results;
