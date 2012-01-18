@@ -38,7 +38,7 @@ function compile(module_code, space, open_tag, close_tag) {
                         arr[m].substring(2).trim().replace(/\n/g, '')+')';
                 pa = true;
             } else if (arr[m].charAt(1) === '=') {
-                str += (pa ? "+(" : ";$+=_e(") +
+                str += (pa ? "+_e(" : ";$+=_e(") +
                         arr[m].substring(2).trim().replace(/\n/g, '')+')';
                 pa = true;
             } else {
@@ -47,19 +47,19 @@ function compile(module_code, space, open_tag, close_tag) {
             }
         }
     } else {
-        arr = module_code.replace(/[\r\t\n]/g, '').replace(/ +/g, ' ')
-                .split(o).join(c+'\x00').split(c);
+        arr = module_code.replace(/[\r\t\n ]+/g, ' ').split(o).join(c+'\x00')
+                .split(c);
         for (m = 0, l = arr.length; m < l; m++) {
             if (arr[m].charAt(0) !== '\x00') {
                 str += (pa ? "+'" : ";$+='") +
-                    arr[m].replace(/(\\|')/g, '\\$1').trim() + "'";
+                    arr[m].replace(/(\\|')/g, '\\$1') + "'";
                 pa = true;
             } else if (arr[m].charAt(1) === '!') {
                 str += (pa ? "+(" : ";$+=(") +
                     arr[m].substring(2).trim() + ')';
                 pa = true;
             } else if (arr[m].charAt(1) === '=') {
-                str += (pa ? "+(" : ";$+=_e(") +
+                str += (pa ? "+_e(" : ";$+=_e(") +
                     arr[m].substring(2).trim() + ')';
                 pa = true;
             } else {
