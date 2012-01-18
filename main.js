@@ -427,7 +427,9 @@ exports.define = function(name) {
                 results.push({
                     data: {id: req[ir].id},
                     content: null,
-                    error: e.toString()
+                    // try to output the stack trace, otherwise just the
+                    // error itself will do
+                    error: e.stack || e.toString()
                 });
             }
         }
