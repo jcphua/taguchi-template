@@ -3,7 +3,8 @@ _taguchi: false */
 
 function view_to_fn(_view_fn) {
     return new Function(
-        'template,request,jsonpointer,analytics,util,render,index,list',
+        'template,request,jsonpointer,analytics,util,render,renderString,\
+        index,list',
         'var recipient=request.recipient,config=template.config,\
         content=template.content,_e=util.xmlFromString;' + _view_fn);
 }
@@ -347,11 +348,10 @@ exports.define = function(name) {
     template.render = function(view_name, content, response) {
         var fn = this._visible_views[view_name], i, l, str,
             render_fn = function(view_name, content) {
-                if (view_name.indexOf('{%') > -1) {
-                    return response.renderString(view_name, content);
-                } else {
-                    return response.render(view_name, content);
-                }
+                return response.render(view_name, content);
+            },
+            render_string_fn = function(tmpl, content) {
+                return response.renderString(tmpl, content);
             };
 
         if (fn === undefined) {
@@ -369,7 +369,8 @@ exports.define = function(name) {
             return str;
         } else {
             return fn.call(content, this, response._request, jsonpointer,
-                        analytics, util, render_fn, 0, [content]);
+                        analytics, util, render_fn, render_string_fn,
+                        0, [content]);
         }
     };
 
@@ -377,14 +378,14 @@ exports.define = function(name) {
     template.renderString = function(tmplString, response) {
         var fn = view_to_fn(view.compile(tmplString, false, '{%', '%}')),
             render_fn = function(view_name, content) {
-                if (view_name.indexOf('{%') > -1) {
-                    return response.renderString(view_name, content);
-                } else {
-                    return response.render(view_name, content);
-                }
+                return response.render(view_name, content);
+            },
+            render_string_fn = function(tmpl, content) {
+                return response.renderString(tmpl, content);
             };
         return fn.call(null, this, response._request, jsonpointer,
-                        analytics, util, render_fn, 0, [null]);
+                        analytics, util, render_fn, render_string_fn,
+                        0, [null]);
     };
 
     // Clones the current context, and calls the appropriate handlers for the
