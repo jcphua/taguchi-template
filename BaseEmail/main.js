@@ -127,6 +127,8 @@ BaseEmail.on('click', function(request, response) {
         dest = link.destination;
     }
 
+    dest = dest.replace(/\&amp;/g, '&');
+
     // increment link click count
     storage.stats.incrementCounter('BaseEmail.clicked.' + link.linkId);
     response.set('/data', {'link': link.destination})
