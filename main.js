@@ -364,7 +364,8 @@ exports.define = function(name) {
             str = '';
             for (i = 0, l = content.length; i < l; i++) {
                 str += fn.call(content[i], this, response._request,
-                        jsonpointer, analytics, util, render_fn, i, content);
+                        jsonpointer, analytics, util, render_fn,
+                        render_string_fn, i, content);
             }
             return str;
         } else {
