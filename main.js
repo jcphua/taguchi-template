@@ -357,6 +357,9 @@ exports.define = function(name) {
         if (fn === undefined) {
             fn = jsonpointer.get(this.views, view_name);
         }
+        if (fn === undefined) {
+            return '';
+        }
 
         // Pass 'content' as the value of this for the view, along with the
         // template and the request
