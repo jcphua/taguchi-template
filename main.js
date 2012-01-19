@@ -90,6 +90,11 @@ Response.prototype.render = function(view_name, content) {
     return this._template.render(view_name, content, this);
 };
 
+// Renders a template string using the current response object
+Response.prototype.renderString = function(tmplString, content) {
+    return this._template.renderString(tmplString, content, this);
+};
+
 
 // Creates a new template with the specified name
 exports.define = function(name) {
@@ -342,7 +347,11 @@ exports.define = function(name) {
     template.render = function(view_name, content, response) {
         var fn = this._visible_views[view_name], i, l, str,
             render_fn = function(view_name, content) {
-                return response.render(view_name, content);
+                if (view_name.indexOf('{%') > -1) {
+                    return response.renderString(view_name, content);
+                } else {
+                    return response.render(view_name, content);
+                }
             };
 
         if (fn === undefined) {
@@ -368,11 +377,15 @@ exports.define = function(name) {
     template.renderString = function(tmplString, response) {
         var fn = view_to_fn(view.compile(tmplString, false, '{%', '%}')),
             render_fn = function(view_name, content) {
-                return response.render(view_name, content);
+                if (view_name.indexOf('{%') > -1) {
+                    return response.renderString(view_name, content);
+                } else {
+                    return response.render(view_name, content);
+                }
             };
         return fn.call(null, this, response._request, jsonpointer,
                         analytics, util, render_fn, 0, [null]);
-    }
+    };
 
     // Clones the current context, and calls the appropriate handlers for the
     // given event, with the template as 'this'.
