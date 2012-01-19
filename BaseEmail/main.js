@@ -117,16 +117,25 @@ BaseEmail.on('open', function(request, response) {
 
 BaseEmail.on('click', function(request, response) {
     // Should return an HTTP document with a redirect to the click-through URL
-    var link = analytics.parseClickTrackingURL(request.get('/path'));
+    var link = analytics.parseClickTrackingURL(request.get('/path')), dest;
+
+    // if the link contains a format string, parse it and apply the format
+    if (link.indexOf('{%') > -1) {
+        dest = this.renderString(
+                view.compile(link, false, '{%', '%}'), response);
+    } else {
+        dest = link.destination;
+    }
+
     // increment link click count
     storage.stats.incrementCounter('BaseEmail.clicked.' + link.linkId);
     response.set('/status', '302 Found')
             .set('/headers', {
                 'Content-Type': 'text/plain; charset="utf-8"',
-                'Location': link.destination || this.BaseEmail.baseURL
+                'Location': dest || this.BaseEmail.baseURL
             })
             .set('/body', 'Location: ' +
-                (link.destination || this.BaseEmail.baseURL))
+                (dest || this.BaseEmail.baseURL))
             .applyFormat(http.format);
 });
 

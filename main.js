@@ -273,8 +273,9 @@ exports.define = function(name) {
             module_name = module_name_or_module.name;
         }
         // replace that module's view
-        this.views[module_name][view_name] = view.compile(file.content,
-            path.extname(view_file_path) === 'txt' ? true : false);
+        this.views[module_name][view_name] = view_to_fn(
+            view.compile(file.content, path.extname(view_file_path) === 'txt'
+                ? true : false));
         return this;
     };
 
@@ -349,7 +350,7 @@ exports.define = function(name) {
 
         // Pass 'content' as the value of this for the view, along with the
         // template and the request
-        if (content.length !== undefined) {
+        if (content && content.length !== undefined) {
             str = '';
             for (i = 0, l = content.length; i < l; i++) {
                 str += fn.call(content[i], this, response._request,
@@ -361,6 +362,16 @@ exports.define = function(name) {
                         analytics, util, render_fn, 0, [content]);
         }
     };
+
+    // Render a compiled format string, e.g. a link with templated content
+    template.renderString = function(tmplString, response) {
+        var fn = view_to_fn(tmplString),
+            render_fn = function(view_name, content) {
+                return response.render(view_name, content);
+            };
+        return fn.call(null, this, response._request, jsonpointer,
+                        analytics, util, render_fn, 0, [null]);
+    }
 
     // Clones the current context, and calls the appropriate handlers for the
     // given event, with the template as 'this'.
@@ -418,7 +429,7 @@ exports.define = function(name) {
                 };
                 result.data.id = request.id;
 
-                if (request.test) {
+                if (request.test || request.debug) {
                     // include some debugging output
                     result.debug = response._response;
                 }
