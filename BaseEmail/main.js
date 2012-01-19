@@ -122,14 +122,15 @@ BaseEmail.on('click', function(request, response) {
     // if the link contains a format string, parse it and apply the format
     if (link.indexOf('{%') > -1) {
         dest = this.renderString(
-                view.compile(link, false, '{%', '%}'), response);
+                view.compile(link.destination, false, '{%', '%}'), response);
     } else {
         dest = link.destination;
     }
 
     // increment link click count
     storage.stats.incrementCounter('BaseEmail.clicked.' + link.linkId);
-    response.set('/status', '302 Found')
+    response.set('/data', {'link': link.destination})
+            .set('/status', '302 Found')
             .set('/headers', {
                 'Content-Type': 'text/plain; charset="utf-8"',
                 'Location': dest || this.BaseEmail.baseURL
