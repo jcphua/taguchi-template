@@ -119,9 +119,6 @@ BaseEmail.on('click', function(request, response) {
     // Should return an HTTP document with a redirect to the click-through URL
     var link = analytics.parseClickTrackingURL(request.get('/path')), dest;
 
-    console.log("Tracking click for ", request.get('/path'), ": ", link);
-    console.log("Available links: ", JSON.parse(storage._getState()).items);
-
     // if the link contains a format string, parse it and apply the format
     if (link.destination.indexOf('{%') > -1) {
         dest = this.renderString(
