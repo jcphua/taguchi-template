@@ -22,6 +22,7 @@ Request = function(template, context) {
     this.test = context.test;
     this.id = context.id;
     this.ref = context.ref;
+    this.params = context.params;
 };
 
 Request.prototype.get = function(jpath) {
