@@ -100,7 +100,10 @@ BaseEmail.on('view.http', function(request, response) {
     // Grab the HTML content, strip the content-transfer-encoding header, and
     // return that as an HTTP response
     response.set('/headers', {'Content-Type': 'text/plain; charset="utf-8"'})
-            .set('/body', response.render('html', this.content))
+            .set('/body', analytics.addHTMLClickTracking(
+                response.render('html', this.content),
+                this.BaseEmail.baseURL, this.messageId,
+                request.id, request.recipient.hash))
             .applyFormat(http.format);
 });
 
