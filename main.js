@@ -448,7 +448,7 @@ exports.define = function(name) {
                 };
                 result.data.id = request.id;
 
-                if (request.test || request.debug) {
+                if (request.test || request._request.debug) {
                     // include some debugging output
                     result.debug = response._response;
                 }
