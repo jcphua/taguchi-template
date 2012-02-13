@@ -122,6 +122,20 @@ BaseEmail.on('click', function(request, response) {
     // Should return an HTTP document with a redirect to the click-through URL
     var link = analytics.parseClickTrackingURL(request.get('/path')), dest;
 
+    // if the link has no destination (link not found), show a 404
+    if (!link.destination) {
+        response.set('/data', {'link': null})
+            .set('/status', '404 Not Found')
+            .set('/headers', {
+                'Content-Type': 'text/plain; charset="utf-8"'
+            })
+            .set('/body', '404 Not Found\r\n' +
+                'The requested page was not found on this server.')
+            .applyFormat(http.format);
+
+        return;
+    }
+
     // if the link contains a format string, parse it and apply the format
     if (link.destination.indexOf('{%') > -1) {
         dest = this.renderString(link.destination, null, response);
