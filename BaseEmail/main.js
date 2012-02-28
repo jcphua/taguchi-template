@@ -45,8 +45,8 @@ BaseEmail.request(function(request, response) {
     if (!request.test && events[request.ref]) {
         storage.stats.incrementCounter(events[request.ref]);
         storage.stats.incrementTimeCounter(events[request.ref]);
-        if (request.ref == 'o' || request.ref == 'c' ||
-                request.ref == 'u') {
+        if (request.ref == 'open' || request.ref == 'click' ||
+                request.ref == 'unsubscribe') {
             storage.stats.updateUniqueCounter(events[request.ref],
                 request.parent.id);
         }

@@ -33,7 +33,7 @@ Request.prototype.get = function(jpath) {
 // Response object -- provides methods to construct & serialize output
 // data
 Response = function(template, request) {
-    this._response_content = '';
+    this._response_format = function(x) { return JSON.stringify(x); };
     this._response = {};
     this._template = template;
     this._request  = request;
@@ -82,7 +82,7 @@ Response.prototype.applyHandlerFrom = function(module_or_module_name) {
 // Applies an output serialisation format (HTTP, MIME etc) to the current
 // response object
 Response.prototype.applyFormat = function(format_fn) {
-    this._response_content = format_fn(this._response);
+    this._response_format = format_fn;
     return this;
 };
 
@@ -293,7 +293,7 @@ exports.define = function(name) {
             // get the name from the module
             module_name = module_name_or_module.name;
         }
-        // replace that module's view
+        // replace that module's hook
         this.hooks[module_name] = fn;
         return this;
     };
@@ -443,7 +443,7 @@ exports.define = function(name) {
 
                 // output response content and response data
                 result = {
-                    content: response._response_content,
+                    content: this._response_format(this._response),
                     data: response._response.data || {}
                 };
                 result.data.id = request.id;
