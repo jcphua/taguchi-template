@@ -443,7 +443,7 @@ exports.define = function(name) {
 
                 // output response content and response data
                 result = {
-                    content: this._response_format(this._response),
+                    content: response._response_format(this._response),
                     data: response._response.data || {}
                 };
                 result.data.id = request.id;
