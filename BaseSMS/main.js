@@ -31,23 +31,21 @@ var template = require('template'),
     BaseSMS = template.define('BaseSMS'),
     events = {
         'send': 'BaseSMS.send',
-        'bounce': 'BaseSMS.bounce',
         'click': 'BaseSMS.click',
-        'unsubscribe': 'BaseSMS.unsubscribe',
-        'forward': 'BaseSMS.forward',
-        'analytics': 'BaseSMS.analytics',
     };
 
 module.exports = BaseSMS;
 
 BaseSMS.load(function() {
     this.BaseSMS = {
-        baseURL: 'http://' + this.config.hostname + '/'
+        baseURL: null
     };
 });
 
 BaseSMS.request(function(request, response) {
-
+    this.BaseSMS.baseURL = 'http://' + request.config.hostname + '/';
+    this.content = request.content;
+    this.messageId = request.messageId;
 });
 
 BaseSMS.on('send.sms', function(request, response) {
@@ -90,27 +88,4 @@ BaseSMS.on('click', function(request, response) {
             .set('/body', 'Location: ' +
                 (link.destination || this.BaseSMS.baseURL))
             .applyFormat(http.format);
-});
-
-BaseSMS.on('analytics', function(request, response) {
-    // Should return an HTTP document with a blank image?
-    response.set('/status', '200 OK')
-            .set('/headers', {'Content-Type': 'image/gif'})
-            .set('/body',
-'\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\xff\xff\xff\x00\x00\x00\
-\x21\xf9\x04\x01\x00\x00\x00\x00\x2c\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\
-\x02\x44\x01\x00\x3b')
-            .applyFormat(http.format);
-});
-
-BaseSMS.on('report.html', function(request, response) {
-    // TODO
-});
-
-BaseSMS.on('report.tex', function(request, response) {
-    // TODO
-});
-
-BaseSMS.on('report.tsv', function(request, response) {
-    // TODO
 });

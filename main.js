@@ -147,35 +147,11 @@ exports.define = function(name) {
                 "*": [],
                 "http": []
             },
-            "bounce": { // used to indicate an error response
-                "*": []
-            },
-            "reply": { // used to indicate a human-originated response
-                "*": [],
-                "smtp": [],
-                "sms": [],
-                "http": []
-            },
             "open": { // always HTTP
                 "*": []
             },
             "click": { // always HTTP
                 "*": []
-            },
-            "analytics": {  // generic remote tracking support
-                "*": []
-            },
-            "forward": { // indicates the message was sent to someone else
-                "*": []
-            },
-            "unsubscribe": {
-                "*": []
-            },
-            "report": {
-                "*": [],
-                "html": [],
-                "tex": [],
-                "tsv": []
             }
         }
     };

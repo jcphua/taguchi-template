@@ -31,8 +31,7 @@ var template = require('template'),
     BaseWebPage = template.define('BaseWebPage'),
     events = {
         'click': 'BaseWebPage.click',
-        'view': 'BaseWebPage.view',
-        'analytics': 'BaseWebPage.analytics',
+        'view': 'BaseWebPage.view'
     };
 
 module.exports = BaseWebPage;
@@ -43,12 +42,14 @@ BaseWebPage.init(function() {
 
 BaseWebPage.load(function() {
     this.BaseWebPage = {
-        baseURL: 'http://' + this.config.hostname + '/'
+        baseURL: null
     };
 });
 
 BaseWebPage.request(function(request, response) {
-
+    this.BaseWebPage.baseURL = 'http://' + request.config.hostname + '/';
+    this.content = request.content;
+    this.messageId = request.messageId;
 });
 
 BaseWebPage.on('view.http', function(request, response) {
@@ -85,27 +86,4 @@ BaseWebPage.on('click', function(request, response) {
             .set('/body', 'Location: ' +
                 (link.destination || this.BaseWebPage.baseURL))
             .applyFormat(http.format);
-});
-
-BaseWebPage.on('analytics', function(request, response) {
-    // Should return an HTTP document with a blank image?
-    resopnse.set('/status', '200 OK')
-            .set('/headers', {'Content-Type': 'image/gif'})
-            .set('/body',
-'\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\xff\xff\xff\x00\x00\x00\
-\x21\xf9\x04\x01\x00\x00\x00\x00\x2c\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\
-\x02\x44\x01\x00\x3b')
-            .applyFormat(http.format);
-});
-
-BaseWebPage.on('report.html', function(request, response) {
-    // TODO
-});
-
-BaseWebPage.on('report.tex', function(request, response) {
-    // TODO
-});
-
-BaseWebPage.on('report.tsv', function(request, response) {
-    // TODO
 });

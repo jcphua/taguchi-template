@@ -31,25 +31,23 @@ var template = require('template'),
     BaseEmail = template.define('BaseEmail'),
     events = {
         'send': 'BaseEmail.send',
-        'bounce': 'BaseEmail.bounce',
         'open': 'BaseEmail.open',
         'click': 'BaseEmail.click',
-        'unsubscribe': 'BaseEmail.unsubscribe',
         'view': 'BaseEmail.view',
-        'forward': 'BaseEmail.forward',
-        'analytics': 'BaseEmail.analytics',
     };
 
 module.exports = BaseEmail;
 
 BaseEmail.load(function() {
     this.BaseEmail = {
-        baseURL: 'http://' + this.config.hostname + '/'
+        baseURL: null
     };
 });
 
 BaseEmail.request(function(request, response) {
-
+    this.BaseEmail.baseURL = 'http://' + request.config.hostname + '/';
+    this.content = request.content;
+    this.messageId = request.messageId;
 });
 
 BaseEmail.on('send.smtp', function(request, response) {
@@ -153,27 +151,4 @@ BaseEmail.on('click', function(request, response) {
             .set('/body', 'Location: ' +
                 (dest || this.BaseEmail.baseURL))
             .applyFormat(http.format);
-});
-
-BaseEmail.on('analytics', function(request, response) {
-    // Should return an HTTP document with a blank image?
-    response.set('/status', '200 OK')
-            .set('/headers', {'Content-Type': 'image/gif'})
-            .set('/body',
-'\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\xff\xff\xff\x00\x00\x00\
-\x21\xf9\x04\x01\x00\x00\x00\x00\x2c\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\
-\x02\x44\x01\x00\x3b')
-            .applyFormat(http.format);
-});
-
-BaseEmail.on('report.html', function(request, response) {
-    // TODO
-});
-
-BaseEmail.on('report.tex', function(request, response) {
-    // TODO
-});
-
-BaseEmail.on('report.tsv', function(request, response) {
-    // TODO
 });
