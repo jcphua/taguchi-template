@@ -44,8 +44,6 @@ BaseSMS.load(function() {
 
 BaseSMS.request(function(request, response) {
     this.BaseSMS.baseURL = 'http://' + request.config.hostname + '/';
-    this.content = request.content;
-    this.messageId = request.messageId;
 });
 
 BaseSMS.on('send.sms', function(request, response) {
@@ -56,9 +54,8 @@ BaseSMS.on('send.sms', function(request, response) {
                 'Content-Type': 'text/plain; charset="utf-8"'
             })
             .set('/body', analytics.addRawClickTracking(
-                response.render('text', this.content),
-                this.BaseSMS.baseURL, request.id,
-                request.recipient.hash))
+                response.render('text', request.content),
+                this.BaseSMS.baseURL, request.id))
             .applyFormat(http.format);
 });
 

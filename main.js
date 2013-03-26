@@ -27,8 +27,8 @@ function view_to_fn(_view_fn) {
     return new Function(
         'template,request,jsonpointer,analytics,util,render,renderString,\
         index,list',
-        'var recipient=request.recipient,config=template.config,\
-        content=template.content,_e=util.xmlFromString;' + _view_fn);
+        'var recipient=request.recipient,config=request.config,\
+        content=request.content,_e=util.xmlFromString;' + _view_fn);
 }
 
 var util = require('util'), fs = require('fs'), path = require('path'),
@@ -46,6 +46,8 @@ Request = function(template, context) {
     this.ref = context.ref;
     this.params = context.params;
     this.parent = context.parent;
+    this.config = context.config;
+    this.content = context.content;
 };
 
 Request.prototype.get = function(jpath) {

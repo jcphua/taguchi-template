@@ -48,8 +48,6 @@ BaseWebPage.load(function() {
 
 BaseWebPage.request(function(request, response) {
     this.BaseWebPage.baseURL = 'http://' + request.config.hostname + '/';
-    this.content = request.content;
-    this.messageId = request.messageId;
 });
 
 BaseWebPage.on('view.http', function(request, response) {

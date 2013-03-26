@@ -40,35 +40,34 @@ module.exports = BaseEmail;
 
 BaseEmail.load(function() {
     this.BaseEmail = {
-        baseURL: null
+        baseURL: null,
+        returnPath: null
     };
 });
 
 BaseEmail.request(function(request, response) {
     this.BaseEmail.baseURL = 'http://' + request.config.hostname + '/';
-    this.content = request.content;
-    this.messageId = request.messageId;
+    this.BaseEmail.returnPath = request.id + '@' + request.config.mta;
 });
 
 BaseEmail.on('send.smtp', function(request, response) {
     // Create the response structure
-    var mail_from = this.config.instance + '.' + request.id + '.' +
-            request.recipient.hash + '@clients.taguchimail.com';
     response.set('/data', {
-                'mail_from': mail_from,
+                'mail_from': this.BaseEmail.returnPath,
                 'rcpt_to': request.recipient.email
             })
             .set('/headers', {
-                'Return-Path': mail_from,
+                'Return-Path': this.BaseEmail.returnPath,
                 'From': 'support@taguchimail.com',
                 'Precedence': 'list',
                 'To': request.recipient.email,
-                'Subject': this.content.subject,
+                'Subject': request.content.subject,
                 'MIME-Version': '1.0',
                 'Content-Type': 'multipart/alternative',
                 'Content-Transfer-Encoding': '8bit'
             })
-            .set('/boundary', mime.boundary(0, request.recipient.hash))
+            .set('/boundary',
+                mime.boundary(0, request.id))
             .set('/body', 'This is a multi-part message in MIME format')
             .append('/subparts', {
                 headers: {
@@ -76,9 +75,8 @@ BaseEmail.on('send.smtp', function(request, response) {
                     'Content-Transfer-Encoding': '8bit'
                 },
                 body: analytics.addRawClickTracking(
-                    response.render('text', this.content),
-                    this.BaseEmail.baseURL, this.messageId,
-                    request.id, request.recipient.hash)
+                    response.render('text', request.content),
+                    this.BaseEmail.baseURL, request.id)
             })
             .append('/subparts', {
                 headers: {
@@ -86,9 +84,8 @@ BaseEmail.on('send.smtp', function(request, response) {
                     'Content-Transfer-Encoding': '8bit'
                 },
                 body: analytics.addHTMLClickTracking(
-                    response.render('html', this.content),
-                    this.BaseEmail.baseURL, this.messageId,
-                    request.id, request.recipient.hash)
+                    response.render('html', request.content),
+                    this.BaseEmail.baseURL, request.id)
             })
             .applyFormat(mime.format);
 });
@@ -98,9 +95,8 @@ BaseEmail.on('view.http', function(request, response) {
     // return that as an HTTP response
     response.set('/headers', {'Content-Type': 'text/plain; charset="utf-8"'})
             .set('/body', analytics.addHTMLClickTracking(
-                response.render('html', this.content),
-                this.BaseEmail.baseURL, this.messageId,
-                request.id, request.recipient.hash))
+                response.render('html', request.content),
+                this.BaseEmail.baseURL, request.id))
             .applyFormat(http.format);
 });
 
