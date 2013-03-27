@@ -41,13 +41,15 @@ module.exports = BaseEmail;
 BaseEmail.load(function() {
     this.BaseEmail = {
         baseURL: null,
-        returnPath: null
+        returnPath: null,
+        fromAddress: null
     };
 });
 
 BaseEmail.request(function(request, response) {
     this.BaseEmail.baseURL = 'http://' + request.config.hostname + '/';
     this.BaseEmail.returnPath = request.id + '@' + request.config.mta;
+    this.BaseEmail.fromAddress = this.BaseEmail.returnPath;
 });
 
 BaseEmail.on('send.smtp', function(request, response) {
@@ -58,7 +60,7 @@ BaseEmail.on('send.smtp', function(request, response) {
             })
             .set('/headers', {
                 'Return-Path': this.BaseEmail.returnPath,
-                'From': 'support@taguchimail.com',
+                'From': this.BaseEmail.fromAddress,
                 'Precedence': 'list',
                 'To': request.recipient.email,
                 'Subject': request.content.subject,
