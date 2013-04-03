@@ -28,17 +28,9 @@ var template = require('template'),
     util = require('util'),
     mime = require('mime'),
     http = require('http'),
-    BaseWebPage = template.define('BaseWebPage'),
-    events = {
-        'click': 'BaseWebPage.click',
-        'view': 'BaseWebPage.view'
-    };
+    BaseWebPage = template.define('BaseWebPage');
 
 module.exports = BaseWebPage;
-
-BaseWebPage.init(function() {
-
-});
 
 BaseWebPage.load(function() {
     this.BaseWebPage = {
@@ -55,33 +47,5 @@ BaseWebPage.on('view.http', function(request, response) {
     // return that as an HTTP response
     response.set('/headers', {'Content-Type': 'text/plain; charset="utf-8"'})
             .set('/body', response.render('html', this.content))
-            .applyFormat(http.format);
-});
-
-BaseWebPage.on('click', function(request, response) {
-    // Should return an HTTP document with a redirect to the click-through URL
-    var link = analytics.parseClickTrackingURL(request.get('/path'));
-
-    // if the link has no destination (link not found), show a 404
-    if (!link.destination) {
-        response.set('/data', {'link': null})
-            .set('/status', '404 Not Found')
-            .set('/headers', {
-                'Content-Type': 'text/plain; charset="utf-8"'
-            })
-            .set('/body', '404 Not Found\r\n' +
-                'The requested page was not found on this server.')
-            .applyFormat(http.format);
-
-        return;
-    }
-
-    response.set('/status', '302 Found')
-            .set('/headers', {
-                'Content-Type': 'text/plain; charset="utf-8"',
-                'Location': link.destination || this.BaseWebPage.baseURL
-            })
-            .set('/body', 'Location: ' +
-                (link.destination || this.BaseWebPage.baseURL))
             .applyFormat(http.format);
 });

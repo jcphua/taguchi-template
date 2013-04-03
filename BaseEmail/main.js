@@ -28,13 +28,7 @@ var template = require('template'),
     util = require('util'),
     mime = require('mime'),
     http = require('http'),
-    BaseEmail = template.define('BaseEmail'),
-    events = {
-        'send': 'BaseEmail.send',
-        'open': 'BaseEmail.open',
-        'click': 'BaseEmail.click',
-        'view': 'BaseEmail.view',
-    };
+    BaseEmail = template.define('BaseEmail');
 
 module.exports = BaseEmail;
 
@@ -42,7 +36,8 @@ BaseEmail.load(function() {
     this.BaseEmail = {
         baseURL: null,
         returnPath: null,
-        fromAddress: null
+        fromAddress: null,
+        tracking: false
     };
 });
 
@@ -50,9 +45,20 @@ BaseEmail.request(function(request, response) {
     this.BaseEmail.baseURL = 'http://' + request.config.hostname + '/';
     this.BaseEmail.returnPath = request.id + '@' + request.config.mta;
     this.BaseEmail.fromAddress = this.BaseEmail.returnPath;
+    this.BaseEmail.tracking = request.config.tracking;
 });
 
-BaseEmail.on('send.smtp', function(request, response) {
+BaseEmail.on('send', function(request, response) {
+    var htmlContent = response.render('html', request.content),
+        textContent = response.render('text', request.content);
+
+    if (this.BaseEmail.tracking) {
+        htmlContent = analytics.addHTMLClickTracking(htmlContent,
+            this.BaseEmail.baseURL, request.id);
+        textContent = analytics.addRawClickTracking(textContent,
+            this.BaseEmail.baseURL, request.id);
+    }
+
     // Create the response structure
     response.set('/data', {
                 'mail_from': this.BaseEmail.returnPath,
@@ -76,40 +82,25 @@ BaseEmail.on('send.smtp', function(request, response) {
                     'Content-Type': 'text/plain; charset="utf-8"',
                     'Content-Transfer-Encoding': '8bit'
                 },
-                body: analytics.addRawClickTracking(
-                    response.render('text', request.content),
-                    this.BaseEmail.baseURL, request.id)
+                body: textContent
             })
             .append('/subparts', {
                 headers: {
                     'Content-Type': 'text/html; charset="utf-8"',
                     'Content-Transfer-Encoding': '8bit'
                 },
-                body: analytics.addHTMLClickTracking(
-                    response.render('html', request.content),
-                    this.BaseEmail.baseURL, request.id)
+                body: htmlContent
             })
             .applyFormat(mime.format);
 });
 
-BaseEmail.on('view.http', function(request, response) {
+BaseEmail.on('view', function(request, response) {
     // Grab the HTML content, strip the content-transfer-encoding header, and
     // return that as an HTTP response
     response.set('/headers', {'Content-Type': 'text/plain; charset="utf-8"'})
             .set('/body', analytics.addHTMLClickTracking(
                 response.render('html', request.content),
                 this.BaseEmail.baseURL, request.id))
-            .applyFormat(http.format);
-});
-
-BaseEmail.on('open', function(request, response) {
-    // Should return an HTTP document with a blank image?
-    response.set('/status', '200 OK')
-            .set('/headers', {'Content-Type': 'image/gif'})
-            .set('/body',
-'\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\xff\xff\xff\x00\x00\x00\
-\x21\xf9\x04\x01\x00\x00\x00\x00\x2c\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\
-\x02\x44\x01\x00\x3b')
             .applyFormat(http.format);
 });
 

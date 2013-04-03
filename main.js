@@ -39,7 +39,6 @@ var util = require('util'), fs = require('fs'), path = require('path'),
 // Request object -- provides methods to interpret requests
 Request = function(template, context) {
     this._request = context;
-    this.protocol = context.protocol;
     this.recipient = context.recipient;
     this.test = context.test;
     this.id = context.id;
@@ -91,18 +90,6 @@ Response.prototype.clear = function(jpath) {
     return this;
 };
 
-// By default, handlers from base templates are always called before
-// the handler in the descendant template; mixin handlers are
-// not called at all. This method enables a specific mixin handler to
-// be called on the current response object.
-Response.prototype.applyHandlerFrom = function(module_or_module_name) {
-    var module_name = typeof module_or_module_name === "string" ?
-            module_or_module_name : module_or_module_name.name,
-        proto = this._request.protocol,
-        handler = this._template.handlers[module_name][proto];
-    return (handler.call(this._template, this._request, this) || this);
-};
-
 // Applies an output serialisation format (HTTP, MIME etc) to the current
 // response object
 Response.prototype.applyFormat = function(format_fn) {
@@ -138,23 +125,10 @@ exports.define = function(name) {
             "output": {}
         },
         handlers: {
-            // These handlers are protocol-oriented. Wildcard handlers ('*')
-            // are called before protocol-specific handlers.
-            "send": { // 'send' is used for push messaging
-                "*": [],
-                "smtp": [],
-                "sms": []
-            },
-            "view": { // 'view' is used for pull messaging
-                "*": [],
-                "http": []
-            },
-            "open": { // always HTTP
-                "*": []
-            },
-            "click": { // always HTTP
-                "*": []
-            }
+            // These handlers are protocol-oriented
+            "send": [],
+            "view": [],
+            "click": []
         }
     };
 
@@ -199,25 +173,16 @@ exports.define = function(name) {
 
     template._copyHandlers = function(source) {
         var self = this;
-        util.each(this.handlers, function(cat, handlers) {
-            util.each(handlers, function(subcat, chain) {
-                // prepend our set of handlers to the template's current
-                // handler set -- just in case someone adds handlers before
-                // calling basedOn
-                self.handlers[cat][subcat] =
-                    source.handlers[cat][subcat].concat(
-                        self.handlers[cat][subcat]);
-            });
+        util.each(this.handlers, function(cat, chain) {
+            // prepend our set of handlers to the template's current
+            // handler set -- just in case someone adds handlers before
+            // calling basedOn
+            self.handlers[cat] =
+                source.handlers[cat].concat(self.handlers[cat]);
         });
     };
 
     template._prepare = function() {
-        // Set up message and request content placeholders
-        this.config = {};
-        this.content = {};
-        this.messageId = null;
-        this.accountId = null;
-
         // Work out mapping of currently-visible views -- try to find the view
         // in the descendant template, then each template in the inheritance
         // hierarchy, then in the mixins in reverse order.
@@ -303,15 +268,11 @@ exports.define = function(name) {
     // events, and 'after' runs after any currently-defined events.
     // Each handler must return the full request context.
     template.on = function(event, callback) {
-        var e = event.split('.'), handlers = this.handlers[e[0]];
+        var handlers = this.handlers[event];
         if (!handlers) {
             return this;
         } else {
-            if (e[1]) {
-                handlers[e[1]].push(callback);
-            } else {
-                handlers['*'].push(callback);
-            }
+            handlers.push(callback);
         }
         return this;
     };
@@ -395,7 +356,7 @@ exports.define = function(name) {
     // Clones the current context, and calls the appropriate handlers for the
     // given event, with the template as 'this'.
     template.handleRequest = function(req) {
-        var i, l, h, ir, lr, handlers, request, response, proto, results = [],
+        var i, l, h, ir, lr, handlers, request, response, results = [],
             result;
 
         if (!req.length) {
@@ -413,7 +374,6 @@ exports.define = function(name) {
             try {
                 request = new Request(this, req[ir]);
                 response = new Response(this, request);
-                proto = req[ir].protocol;
 
                 // run request hook
                 for (i = 0, l = this.ancestors.length; i < l; i++) {
@@ -423,14 +383,10 @@ exports.define = function(name) {
                     }
                 }
 
-                // call each handler function
-                h = handlers['*'] || [];
-                for (i = 0, l = h.length; i < l; i++) {
-                    response = h[i].call(this, request, response) || response;
-                }
-                h = handlers[proto] || [];
-                for (i = 0, l = h.length; i < l; i++) {
-                    response = h[i].call(this, request, response) || response;
+                // call each handler function in order
+                for (i = 0, l = handlers.length; i < l; i++) {
+                    response = handlers[i].call(this, request, response) ||
+                        response;
                 }
 
                 // run output hook

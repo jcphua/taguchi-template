@@ -28,34 +28,38 @@ var template = require('template'),
     util = require('util'),
     mime = require('mime'),
     http = require('http'),
-    BaseSMS = template.define('BaseSMS'),
-    events = {
-        'send': 'BaseSMS.send',
-        'click': 'BaseSMS.click',
-    };
+    BaseSMS = template.define('BaseSMS');
 
 module.exports = BaseSMS;
 
 BaseSMS.load(function() {
     this.BaseSMS = {
-        baseURL: null
+        baseURL: null,
+        fromNumber: null,
+        tracking: false
     };
 });
 
 BaseSMS.request(function(request, response) {
     this.BaseSMS.baseURL = 'http://' + request.config.hostname + '/';
+    this.BaseSMS.tracking = request.config.tracking;
 });
 
-BaseSMS.on('send.sms', function(request, response) {
+BaseSMS.on('send', function(request, response) {
+    var content = response.render('text', request.content);
+
+    if (this.BaseSMS.tracking) {
+        content = analytics.addRawClickTracking(content, this.BaseSMS.baseURL,
+            request.id);
+    }
+
     // Create the response structure
     response.set('/headers', {
-                'From': 'support@taguchimail.com',
-                'To': request.recipient.email,
+                'From': this.BaseSMS.fromNumber,
+                'To': request.recipient.phone,
                 'Content-Type': 'text/plain; charset="utf-8"'
             })
-            .set('/body', analytics.addRawClickTracking(
-                response.render('text', request.content),
-                this.BaseSMS.baseURL, request.id))
+            .set('/body', content)
             .applyFormat(http.format);
 });
 
