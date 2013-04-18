@@ -124,7 +124,9 @@ BaseEmail.on('click', function(request, response) {
 
     // if the link contains a format string, parse it and apply the format
     if (link.destination.indexOf('{%') > -1) {
-        dest = this.renderString(link.destination, null, response);
+        dest = this.renderString(
+            link.destination.replace(/\{%/g, '<%').replace(/%\}/g, '%>'),
+            null, response);
     } else {
         dest = link.destination;
     }
