@@ -69,7 +69,7 @@ BaseEmail.on('send', function(request, response) {
                 'From': this.BaseEmail.fromAddress,
                 'Precedence': 'list',
                 'To': request.recipient.email,
-                'Subject': request.content.subject,
+                'Subject': this.renderString(request.content.subject, {}, response),
                 'MIME-Version': '1.0',
                 'Content-Type': 'multipart/alternative',
                 'Content-Transfer-Encoding': '8bit'
