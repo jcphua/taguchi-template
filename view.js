@@ -75,7 +75,7 @@ function compile(module_code, space, open_tag, close_tag) {
         for (m = 0, l = arr.length; m < l; m++) {
             if (arr[m].charAt(0) !== '\x00') {
                 str += (pa ? "+'" : ";$+='") +
-                    arr[m].replace(/(\\|')/g, '\\$1') + "'";
+                    arr[m].replace(/(\\|')/g, '\\$1').replace(/\n/g, ' ') + "'";
                 pa = true;
             } else if (arr[m].charAt(1) === '!') {
                 str += (pa ? "+(" : ";$+=(") +
