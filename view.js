@@ -70,7 +70,7 @@ function compile(module_code, space, open_tag, close_tag) {
             }
         }
     } else {
-        arr = module_code.replace(/[\r\t\n ]+/g, ' ').split(o).join(c+'\x00')
+        arr = module_code.replace(/[\r\t ]+/g, ' ').split(o).join(c+'\x00')
                 .split(c);
         for (m = 0, l = arr.length; m < l; m++) {
             if (arr[m].charAt(0) !== '\x00') {
