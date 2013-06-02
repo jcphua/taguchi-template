@@ -47,6 +47,7 @@ Request = function(template, context) {
     this.parent = context.parent;
     this.config = context.config;
     this.content = context.content;
+    this.additionalContent = context.additionalContent || {};
 };
 
 Request.prototype.get = function(jpath) {
