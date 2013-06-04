@@ -130,7 +130,9 @@ exports.define = function(name) {
             "send": [],
             "view": [],
             "click": []
-        }
+        },
+        openTag: "{%",
+        closeTag: "%}"
     };
 
     template.views[name] = {};
@@ -144,7 +146,8 @@ exports.define = function(name) {
                 viewname = path.basename(fpath).split('.')[0];
                 self.views[name][viewname] = view_to_fn(
                     view.compile(file.content,
-                        path.extname(fpath) === 'txt' ? true : false)
+                        path.extname(fpath) === 'txt' ? true : false,
+                        template.openTag, template.closeTag)
                 );
             }
             re.lastIndex = 0;
@@ -248,7 +251,7 @@ exports.define = function(name) {
         // replace that module's view
         this.views[module_name][view_name] = view_to_fn(
             view.compile(file.content, path.extname(view_file_path) === 'txt'
-                ? true : false));
+                ? true : false, template.openTag, template.closeTag));
         return this;
     };
 
@@ -344,7 +347,7 @@ exports.define = function(name) {
     template.renderString = function(tmplString, content, response) {
         var fn = view_to_fn(view.compile(
                 (tmplString || "").replace(/&lt;%/g, "<%").replace(/%&gt;/g, "%>"),
-                false)),
+                false, template.openTag, template.closeTag)),
             render_fn = function(view_name, content) {
                 return response.render(view_name, content);
             },
