@@ -28,6 +28,7 @@ var template = require('template'),
     util = require('util'),
     mime = require('mime'),
     http = require('http'),
+    cssInliner = require('../cssinliner'),
     BaseEmail = template.define('BaseEmail');
 
 module.exports = BaseEmail;
@@ -37,7 +38,8 @@ BaseEmail.load(function() {
         baseURL: null,
         returnPath: null,
         fromAddress: null,
-        tracking: false
+        tracking: false,
+        inlineCss: false
     };
 });
 
@@ -57,6 +59,10 @@ BaseEmail.on('send', function(request, response) {
             this.BaseEmail.baseURL, request.id);
         textContent = analytics.addRawClickTracking(textContent,
             this.BaseEmail.baseURL, request.id);
+    }
+
+    if (this.BaseEmail.inlineCss) {
+        htmlContent = cssInliner(htmlContent);
     }
 
     // Create the response structure
