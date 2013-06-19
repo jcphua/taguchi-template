@@ -112,7 +112,7 @@
     </head>
     <body bgcolor="#e6e7e8" style="margin:0;padding:0;" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
         <!-- Open-rate tracking image -->
-        <img src="{%= analytics.openTrackingImage(template.BaseEmail.baseURL, template.config.message_id, request.id, recipient.hash) %}" width="10" height="1" alt="{%= this.description %}" />
+        <img src="{%= analytics.openTrackingImage(template.BaseEmail.baseURL, request.id) %}" width="10" height="1" alt="{%= this.description %}" />
 
         <table width="100%" cellpadding="0" cellspacing="0" id="wrap" align="center">
             <!-- Display the approval header, if present -->
