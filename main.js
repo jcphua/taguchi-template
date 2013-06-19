@@ -207,7 +207,8 @@ exports.define = function(name) {
             // load the module -- special-case included modules
             if (module_name_or_module == 'BaseEmail' ||
                     module_name_or_module == 'BaseSMS' ||
-                    module_name_or_module == 'BaseWebPage') {
+                    module_name_or_module == 'BaseWebPage' ||
+                    module_name_or_module == 'SmartEmail') {
                 module_name_or_module =
                     'template/' + module_name_or_module + '/main';
             }

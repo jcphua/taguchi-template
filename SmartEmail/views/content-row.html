@@ -1,0 +1,33 @@
+<table cellspacing="0" cellpadding="0" style="display:block" width="{%= template.SmartEmail.contentWidth %}">
+    <tr>
+        {%
+            var row = this.items,
+                extraSpace = 0,
+                pad = row[0].nopadding !== 'yes' ? true : false,
+                wmap = pad ? template.SmartEmail.paddedItemExteriorWidths :
+                        template.SmartEmail.itemExteriorWidths,
+                allocWidth = 0,
+                maxWidth = pad ? template.SmartEmail.contentWidth :
+                        template.SmartEmail.contentWidth -
+                            template.SmartEmail.paddingWidth*2;
+
+            /* Sum item widths to determine how much padding space to
+                allocate */
+            util.each(row, function (i, item) {
+                allocWidth += wmap[item.width];
+            });
+
+            /* Work out how much extra space per item */
+            extraSpace = Math.floor((maxWidth - allocWidth) / row.length);
+        %}
+        {% if (pad) { %}<td width="{%= template.SmartEmail.paddingWidth %}">&#160;</td>{% } %}
+        {% util.each(row, function (i, item) { %}
+            <td width="{%= wmap[item.width] + extraSpace %}"
+                    align="{%= i == 0 && extraSpace == 0 ? 'left' : (i == row.length - 1 && extraSpace == 0 ? 'right' : 'center') %}"
+                    valign="top">
+                {%! render(item.type, item) %}
+            </td>
+        {% }) %}
+        {% if (pad) { %}<td width="{%= template.SmartEmail.paddingWidth %}">&#160;</td>{% } %}
+    </tr>
+</table>

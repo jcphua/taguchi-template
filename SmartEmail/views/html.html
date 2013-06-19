@@ -1,0 +1,206 @@
+<html>
+    <head>
+        <style>
+            a {
+                font-family: arial, helvetica, sans-serif;
+                color: #95c22e;
+                border: none;
+                font-weight:bold;
+            }
+
+            td.title div, td.surtitle div {
+                font-size: 14px;
+                font-family: arial, helvetica, sans-serif;
+                line-height: 20px;
+                color: #333333;
+                font-weight: bold;
+            }
+
+            td.title a {
+                text-decoration: none;
+            }
+
+            table.third td.title div, table.quarter td.title div,
+            table.third td.surtitle div, table.quarter td.surtitle div {
+                font-size: 12px;
+                line-height: 18px;
+            }
+
+            td.price div {
+                font-size: 14px;
+                font-family: arial, helvetica, sans-serif;
+                line-height: 18px;
+                color: #95c22e;
+                font-weight: bold;
+            }
+
+            table.third td.price div, table.quarter td.price div {
+                font-size: 12px;
+                line-height: 16px;
+            }
+
+            td.price-detail div {
+                font-size: 12px;
+                font-family: arial, helvetica, sans-serif;
+                line-height: 16px;
+                color: #000000;
+                font-weight: bold;
+            }
+
+            table.third td.price-detail div, table.quarter td.price-detail div {
+                font-size: 11px;
+                line-height: 13px;
+            }
+
+            td.description div {
+                font-size: 12px;
+                font-family: arial, helvetica, sans-serif;
+                line-height: 16px;
+                color: #000000;
+            }
+
+            table.third td.description div, table.quarter td.description div {
+                font-size: 11px;
+                line-height: 15px;
+            }
+
+            td.image {
+                text-align: left;
+            }
+
+            table.quarter td.image {
+                text-align: center;
+            }
+
+            .introtitle {
+                color: #333333;
+                font-family: arial, sans-serif;
+                font-size: 24px;
+                font-weight: bold;
+            }
+
+            .introdesc {
+                color: #333333;
+                font-family: arial, sans-serif;
+                font-size: 16px;
+                line-height: 20px;
+            }
+
+            .viewonline, .viewonlineurl {
+                font-family: arial, helvetica, sans-serif;
+                font-size: 10px;
+                color: #aaaaaa;
+                font-weight: normal;
+            }
+
+            .viewonlineurl {
+                text-decoration: none;
+            }
+
+            .footer {
+                background-color: #e6e7e8;
+            }
+
+            .footertext {
+                font-family: arial, helvetica, sans-serif;
+                font-size: 11px;
+                line-height: 16px;
+                color: #666666;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body bgcolor="#e6e7e8" style="margin:0;padding:0;" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+        <!-- Open-rate tracking image -->
+        <img src="{%= analytics.openTrackingImage(template.BaseEmail.baseURL, template.config.message_id, request.id, recipient.hash) %}" width="10" height="1" alt="{%= this.description %}" />
+
+        <table width="100%" cellpadding="0" cellspacing="0" id="wrap" align="center">
+            <!-- Display the approval header, if present -->
+            {% if (this.header) { %}
+                <tr>
+                    <td bgcolor="#fffbd9">
+                        <table width="{%= template.SmartEmail.width %}">
+                            <tr><td>{%! this.header %}</td></tr>
+                        </table>
+                    </td>
+                </tr>
+            {% } %}
+            <tr>
+                <td>
+                    <table width="{%= template.SmartEmail.width %}" cellspacing="0" cellpadding="0" id="content" align="center" bgcolor="#ffffff">
+                        <!-- View online url -->
+                        <tr>
+                            <td>
+                                <table border="0" cellpadding="0" cellspacing="0" width="{%= template.SmartEmail.width %}" align="center">
+                                    <tr><td height="5"></td></tr>
+                                    <tr>
+                                        <td class="viewonline" align="center">
+                                            If you can't view this email, <a href="{%= template.SmartEmail.viewOnlineURL %}" target="_blank">click here</a>
+                                        </td>
+                                    </tr>
+                                    <tr><td height="5"></td></tr>
+                                </table>
+                            </td>
+                        </tr>
+
+                        <!-- Header -->
+                        <tr>
+                            <td width="{%= template.SmartEmail.contentWidth %}">
+                                <a href="http://www.taguchimail.com/" target="_blank"><img src="http://c.lnk.tc/st/images/header.gif" alt="Taguchi Travel" width="600" height="109" border="0" style="display:block;" /></a>
+                            </td>
+                        </tr>
+
+                        <!-- Content -->
+                        <tr>
+                            <td width="{%= template.SmartEmail.contentWidth %}" align="center">
+                                {%
+                                var rows = [], currentWidth = 0, currentRow = [];
+                                /* Divide the item sequence up into rows. */
+                                util.each(this.channels.content.items, function (i, item) {
+                                    if (item.type === 'spacer' || item.type === 'intro-article') {
+                                        item.width = '1/1';
+                                    }
+                                    currentWidth += template.SmartEmail.itemExteriorWidths[item.width];
+                                    if (currentWidth > template.SmartEmail.contentWidth) {
+                                        rows.push(currentRow);
+                                        currentRow = [item];
+                                        currentWidth = template.SmartEmail.itemExteriorWidths[item.width];
+                                    } else {
+                                        currentRow.push(item);
+                                    }
+                                });
+                                /* Render each row. */
+                                util.each(rows, function (i, row) {
+                                %}
+                                    {%! render('content-row', {items: row}) %}
+                                {% }) %}
+                            </td>
+                        </tr>
+
+                        <!-- Footer -->
+                        <tr>
+                            <td width="{%= template.SmartEmail.contentWidth %}" align="center">
+                                <table cellspacing="0" cellpadding="0" border="0" width="{%= template.SmartEmail.contentWidth %}" class="footer">
+                                    <tr>
+                                        <td colspan="3">
+                                            <a href="http://www.taguchimail.com/" target="_blank"><img src="http://c.lnk.tc/st/images/footer.gif" alt="Taguchi Travel - Call (01) 2345 6789" width="600" height="134" border="0" style="display:block;" /></a>
+                                        </td>
+                                    </tr>
+                                    <tr><td height="10" colspan="3"></td></tr>
+                                    <tr>
+                                        <td width="20"></td>
+                                        <td class="footertext">
+                                            You received this email because you selected to be updated by us. If you no longer wish to receive our promotional emails <a href="{%= template.SmartEmail.listUnsubscribeURL %}{onclick:Unsubscribed:default}">click here to unsubscribe</a>.
+                                        </td>
+                                        <td width="20"></td>
+                                    </tr>
+                                    <tr><td height="30"></td></tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
+</html>

@@ -1,0 +1,27 @@
+{%
+    var dim = {'1/1': [270, 270], '1/2': [270, 270], '1/3': [175, 175], '1/4': [125, 125]}[this.width];
+    if (!this.image) {
+        this.image = 'http://www.fakenamegenerator.com/dummyimage/' + dim[0] + 'x' + dim[1] + '/CCCCCC/000000/1'
+    }
+%}
+<table width="{%= template.SmartEmail.itemInteriorWidths[this.width] %}" cellspacing="0" cellpadding="0" class="{%= template.SmartEmail.itemClasses[this.width] %}">
+    {% if (this.width === '1/1') { %}
+        <tr>
+            <td rowspan="5" align="center" valign="top" width="{%= dim[0] %}">
+                <a href="{%= this.link %}" style="display:block"><img src="{%= this.image %}" width="{%= dim[0] %}" height="{%= dim[1] %}" alt="{%= this.title %}" border="0" style="display:block"/></a>
+            </td>
+            <td class="surtitle" align="left">{%! this.surtitle %}</td>
+        </tr>
+    {% } else if (this.width === '1/2' || this.width === '1/3' || this.width === '1/4') { %}
+        <tr>
+            <td align="center" valign="top">
+                <a href="{%= this.link %}" style="display:block"><img src="{%= this.image %}" width="{%= dim[0] %}" height="{%= dim[1] %}" alt="{%= this.title %}" border="0" style="display:block"/></a>
+            </td>
+        </tr>
+        <tr><td class="surtitle" align="left" valign="top">{%! this.surtitle %}</td></tr>
+    {% } %}
+    <tr><td class="title" align="left" valign="top">{%! this.title %}</td></tr>
+    <tr><td class="price" align="left" valign="top">{%! this.price %}</td></tr>
+    <tr><td class="price-detail" align="left" valign="top">{%! this.price_detail %}</td></tr>
+    <tr><td class="description" align="left" valign="top"><br/>{%! this.description %}</td></tr>
+</table>

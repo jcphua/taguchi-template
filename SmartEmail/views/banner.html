@@ -1,0 +1,16 @@
+{%
+if (this.image) {
+    if (this.link) { %}
+        <a href="{%= this.link %}" target="_blank"><img src="{%= this.image %}" alt="{%= this.title %}" align="{%= this.align %}" border="0" style="display:block" /></a>
+    {% } else { %}
+        <img src="{%= this.image %}" alt="{%= this.title %}" align="{%= this.align %}" border="0" style="display:block" />
+    {% }
+} else {
+    var width = Math.floor(this.nopadding === 'yes' ? template.SmartEmail.itemExteriorWidths[this.width] : template.SmartEmail.paddedItemExteriorWidths[this.width]);
+    if (this.link) { %}
+        <a href="{%= this.link %}" target="_blank"><img src="http://www.fakenamegenerator.com/dummyimage/{%= width %}x100/CCCCCC/000000/1" alt="Placeholder" width="{%= width %}" height="100" border="0" style="display:block" /></a>
+    {% } else { %}
+       <img src="http://www.fakenamegenerator.com/dummyimage/{%= width %}x100/CCCCCC/000000/1" alt="Placeholder" width="{%= width %}" height="100" border="0" style="display:block" />
+    {% }
+}
+%}

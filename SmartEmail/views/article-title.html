@@ -1,0 +1,5 @@
+{% if (this.link) { %}
+    <a href="{%= this.link %}" target="_blank">{%! this.title %}</a>
+{% } else { %}
+    {%! this.title %}
+{% } %}
