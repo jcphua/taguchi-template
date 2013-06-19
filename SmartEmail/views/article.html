@@ -1,28 +1,28 @@
 {%
-    if (this.imgpos = 'noimage') {
+    if (this.imgpos == 'noimage') {
         this.image = '';
     } else if (!this.image) {
         this.image = 'http://www.fakenamegenerator.com/dummyimage/100x100/CCCCCC/000000/1';
     }
 %}
 <table width="{%= template.SmartEmail.itemInteriorWidths[this.width] %}" cellspacing="0" cellpadding="0" class="{%= template.SmartEmail.itemClasses[this.width] %}">
-    {% if (this.imgpos = 'above') { this.align = 'center'; %}
+    {% if (this.imgpos == 'above') { this.align = 'center'; %}
         <!-- Image Above Structure -->
         <tr><td class="title" align="left">{%! render('article-title', this) %}</td></tr>
         <tr><td height="10"></td></tr>
         <tr>
             <td align="center">{%! render('article-image', this) %}</td>
         </tr>
-        <tr><td class="description" align="left">{%= this.description %}</td></tr>
-    {% } else if (this.imgpos = 'left') { this.align = 'left'; %}
+        <tr><td class="description" align="left">{%! this.description %}</td></tr>
+    {% } else if (this.imgpos == 'left') { this.align = 'left'; %}
         <!-- Image Left Structure -->
         <tr><td class="title" colspan="2" align="left">{%! render('article-title', this) %}</td></tr>
         <tr><td height="10"></td></tr>
         <tr valign="top">
             <td align="left" valign="top">{%! render('article-image', this) %}</td>
-            <td class="description" align="left" valign="top">{%= this.description %}</td>
+            <td class="description" align="left" valign="top">{%! this.description %}</td>
         </tr>
-    {% } else if (this.imgpos = 'left-wrap') { this.align = 'left'; %}
+    {% } else if (this.imgpos == 'left-wrap') { this.align = 'left'; %}
         <!-- Image Left Wrap Structure -->
         <tr><td class="title" align="left">{%! render('article-title', this) %}</td></tr>
         <tr><td height="10"></td></tr>
@@ -32,15 +32,15 @@
                 {%! this.description %}
             </td>
         </tr>
-    {% } else if (this.imgpos = 'right') { this.align = 'right'; %}
+    {% } else if (this.imgpos == 'right') { this.align = 'right'; %}
         <!-- Image Right Structure -->
         <tr><td class="title" colspan="2" align="left">{%! render('article-title', this) %}</td></tr>
         <tr><td height="10"></td></tr>
         <tr valign="top">
-            <td class="description" align="left">{%= this.description %}</td>
+            <td class="description" align="left">{%! this.description %}</td>
             <td align="right">{%! render('article-image', this) %}</td>
         </tr>
-    {% } else if (this.imgpos = 'right-wrap') { this.align = 'right'; %}
+    {% } else if (this.imgpos == 'right-wrap') { this.align = 'right'; %}
         <!-- Image Right Wrap Structure -->
         <tr><td class="title" align="left">{%! render('article-title', this) %}</td></tr>
         <tr><td height="10"></td></tr>
@@ -50,7 +50,7 @@
                 {%! this.description %}
             </td>
         </tr>
-    {% } else if (this.imgpos = 'noimage') { %}
+    {% } else if (this.imgpos == 'noimage') { %}
         <!-- No Image Structure -->
         <tr><td class="title" align="left">{%! render('article-title', this) %}</td></tr>
         <tr><td height="10"></td></tr>

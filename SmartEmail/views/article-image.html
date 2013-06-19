@@ -1,5 +1,11 @@
-{% if (this.link) { %}
-    <a href="{%= this.link %}" target="_blank"><img src="{%= this.image %}" alt="{%= this.title %}" align="{%= this.align %}" border="0" /></a>
+{%
+var width = template.SmartEmail.itemInteriorWidths[this.width];
+if (this.imgpos != "above") {
+    width = width / 2;
+}
+
+if (this.link) { %}
+    <a href="{%= this.link %}" target="_blank"><img src="{%= template.SmartEmail.resizeURL(this.image, width) %}" alt="{%= this.title %}" align="{%= this.align %}" border="0" /></a>
 {% } else { %}
-    <img src="{%= this.image %}" alt="{%= this.title %}" align="{%= this.align %}" border="0" />
+    <img src="{%= template.SmartEmail.resizeURL(this.image, width) %}" alt="{%= this.title %}" align="{%= this.align %}" border="0" />
 {% } %}
