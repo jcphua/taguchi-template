@@ -257,6 +257,8 @@ function apply_internal_style(obj, rules, parents) {
         }
         // set the value of attribute style if required
         if (style !== "") {
+            // replace multiple ;s with just one ;
+            //obj.attributes.style = style.replace(/;\s*;/gm, ";");
             obj.attributes.style = style;
         }
     }
@@ -269,7 +271,8 @@ leading spaces.
 module.exports = function(input) {
     var parents = [];
     var rules = [];
-    var rows = input.split("<");
+    // need to remove spaces before the first tag (a corner case)
+    var rows = input.trim().split("<");
     for (var i = 0; i < rows.length; i++) {
         var row = rows[i];
         if (row !== "") {
