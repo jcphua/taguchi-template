@@ -42,7 +42,7 @@ BaseWebPage.request(function(request, response) {
     this.BaseWebPage.baseURL = 'http://' + request.config.hostname + '/';
 });
 
-BaseWebPage.on('view.http', function(request, response) {
+BaseWebPage.on('view', function(request, response) {
     // Grab the HTML content, strip the content-transfer-encoding header, and
     // return that as an HTTP response
     response.set('/headers', {'Content-Type': 'text/plain; charset="utf-8"'})
