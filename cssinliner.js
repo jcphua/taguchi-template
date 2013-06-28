@@ -258,8 +258,7 @@ function apply_internal_style(obj, rules, parents) {
         // set the value of attribute style if required
         if (style !== "") {
             // replace multiple ;s with just one ;
-            //obj.attributes.style = style.replace(/;\s*;/gm, ";");
-            obj.attributes.style = style;
+            obj.attributes.style = style.replace(/;\s*;/gm, ";");
         }
     }
 }
