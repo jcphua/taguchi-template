@@ -101,12 +101,16 @@ BaseEmail.on('send', function(request, response) {
 });
 
 BaseEmail.on('view', function(request, response) {
+    var htmlContent = response.render('html', request.content);
+    if (this.BaseEmail.tracking) {
+        htmlContent = analytics.addHTMLClickTracking(htmlContent,
+            this.BaseEmail.baseURL, request.id);
+    }
+
     // Grab the HTML content, strip the content-transfer-encoding header, and
     // return that as an HTTP response
     response.set('/headers', {'Content-Type': 'text/plain; charset="utf-8"'})
-            .set('/body', analytics.addHTMLClickTracking(
-                response.render('html', request.content),
-                this.BaseEmail.baseURL, request.id))
+            .set('/body', htmlContent)
             .applyFormat(http.format);
 });
 
