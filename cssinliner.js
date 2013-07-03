@@ -258,8 +258,7 @@ function apply_internal_style(obj, rules, parents) {
         // set the value of attribute style if required
         if (style !== "") {
             // replace multiple ;s with just one ;
-            //obj.attributes.style = style.replace(/;\s*;/gm, ";");
-            obj.attributes.style = style;
+            obj.attributes.style = style.replace(/;\s*;/gm, ";");
         }
     }
 }
@@ -277,8 +276,13 @@ module.exports = function(input) {
         var row = rows[i];
         if (row !== "") {
             // HTML comment <!-- ... -->, skip
-            if (row.substr(0, 3) == "!--" && row.substr(row.length - 4, 3) == "-->") {
-                rows[i] = ["<", row].join("");
+            if (rows[i].substr(0, 3) == "!--") { 
+                for ( ; i < rows.length; i++) {
+                    rows[i] = ["<", rows[i]].join("");
+                    if (rows[i].trim().substr(rows[i].trim().length - 3, 3) == "-->") {
+                        break;
+                    } 
+                }
                 continue;
             }
             // HTML content, process
