@@ -45,7 +45,7 @@ BaseWebPage.request(function(request, response) {
 BaseWebPage.on('view', function(request, response) {
     // Grab the HTML content, strip the content-transfer-encoding header, and
     // return that as an HTTP response
-    response.set('/headers', {'Content-Type': 'text/plain; charset="utf-8"'})
+    response.set('/headers', {'Content-Type': 'text/html; charset="utf-8"'})
             .set('/body', response.render('html', this.content))
             .applyFormat(http.format);
 });
