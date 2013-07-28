@@ -52,7 +52,8 @@ BaseEmail.request(function(request, response) {
 
 BaseEmail.on('send', function(request, response) {
     var htmlContent = response.render('html', request.content),
-        textContent = response.render('text', request.content);
+        textContent = response.render('text', request.content),
+        bodySubparts;
 
     if (this.BaseEmail.tracking) {
         htmlContent = analytics.addHTMLClickTracking(htmlContent,
@@ -64,6 +65,23 @@ BaseEmail.on('send', function(request, response) {
     if (this.BaseEmail.inlineCss) {
         htmlContent = cssInliner(htmlContent);
     }
+
+    bodySubparts = [
+        {
+            headers: {
+                'Content-Type': 'text/plain; charset="utf-8"',
+                'Content-Transfer-Encoding': '8bit'
+            },
+            body: textContent
+        },
+        {
+            headers: {
+                'Content-Type': 'text/html; charset="utf-8"',
+                'Content-Transfer-Encoding': '8bit'
+            },
+            body: htmlContent
+        }
+    ];
 
     // Create the response structure
     response.set('/data', {
@@ -82,22 +100,36 @@ BaseEmail.on('send', function(request, response) {
             })
             .set('/boundary',
                 mime.boundary(0, request.id))
-            .set('/body', 'This is a multi-part message in MIME format')
-            .append('/subparts', {
-                headers: {
-                    'Content-Type': 'text/plain; charset="utf-8"',
-                    'Content-Transfer-Encoding': '8bit'
-                },
-                body: textContent
-            })
-            .append('/subparts', {
-                headers: {
-                    'Content-Type': 'text/html; charset="utf-8"',
-                    'Content-Transfer-Encoding': '8bit'
-                },
-                body: htmlContent
-            })
-            .applyFormat(mime.format);
+            .set('/body', 'This is a multi-part message in MIME format');
+
+    if (request.content.attachments) {
+        response.set('/headers/Content-Type', 'multipart/mixed')
+                .append('/subparts', {
+                    headers: {
+                        'Content-Type': 'multipart/alternative',
+                        'Content-Transfer-Encoding': '8bit'
+                    },
+                    body: '',
+                    boundary: mime.boundary(1, request.id),
+                    subparts: bodySubparts
+                })
+
+        for (var i = 0; i < request.content.attachments.length; i++) {
+            response.append('/subparts', {
+                    headers: {
+                        'Content-Type': request.content.attachments[i].type,
+                        'Content-Transfer-Encoding': 'base64',
+                        'Content-Disposition': 'attachment; filename=' +
+                            request.content.attachments[i].name
+                    },
+                    body: request.content.attachments[i].value
+                });
+        }
+    } else {
+        response.set('/subparts', bodySubparts);
+    }
+
+    response.applyFormat(mime.format);
 });
 
 BaseEmail.on('view', function(request, response) {
