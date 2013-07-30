@@ -110,7 +110,7 @@ Response.prototype.renderString = function(tmplString, content) {
 
 
 // Creates a new template with the specified name
-exports.define = function(name) {
+exports.define = function(name, openTag, closeTag) {
     var template = {
         name: name,
         ancestors: [name],
@@ -131,8 +131,8 @@ exports.define = function(name) {
             "view": [],
             "click": []
         },
-        openTag: "{%",
-        closeTag: "%}"
+        openTag: openTag || "{%",
+        closeTag: closeTag || "%}"
     };
 
     template.views[name] = {};
