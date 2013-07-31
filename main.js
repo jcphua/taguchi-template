@@ -364,7 +364,7 @@ exports.define = function(name, openTag, closeTag) {
     // given event, with the template as 'this'.
     template.handleRequest = function(req) {
         var i, l, h, ir, lr, handlers, request, response, results = [],
-            result;
+            result, globalContent = null;
 
         if (!req.length) {
             req = [req];
@@ -379,6 +379,14 @@ exports.define = function(name, openTag, closeTag) {
             }
 
             try {
+                // If a request's content is null, use the content from the
+                // preceding request (speeds up processing of large batches)
+                if (req[ir].content) {
+                    globalContent = req[ir].content;
+                } else {
+                    req[ir].content = globalContent;
+                }
+
                 request = new Request(this, req[ir]);
                 response = new Response(this, request);
 
