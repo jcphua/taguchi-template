@@ -44,8 +44,8 @@ var type_of = Object.prototype.toString,
     _e = require('util').xmlFromString;
 
 function compile(module_code, space, open_tag, close_tag) {
-    var str = '', m, l, pa = true, arr, o = open_tag || '<%',
-            c = close_tag || '%>';
+    var str = '', m, l, pa = true, arr, o = open_tag || '{%',
+            c = close_tag || '%}';
 
     if (space === 'preserve') {
         arr = module_code.replace(/[\r\t]/g, '')

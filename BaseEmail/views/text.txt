@@ -1,1 +1,1 @@
-<%= this.text_content %>
+{%= this.text_content %}
