@@ -2,7 +2,9 @@
 
 var LETTERS = /\w/;
 var SPACES = /\s/;
-var VOID_ELEMENTS = ["br", "wbr", "hr"];
+var VOID_ELEMENTS = ["area", "base", "br", "col", "command", "embed", "hr", 
+    "img", "input", "keygen", "link", "meta", "param", "source", "track", 
+    "wbr"];
 
 /** Checks if the input is a letter */
 function is_letter(input) {
