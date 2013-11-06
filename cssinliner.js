@@ -118,7 +118,7 @@ function process_start_tag(input) {
         // this tag is also an end tag
         obj.end = true;
     }
-    // for certain void elements, they are considered start-end tags
+    // for void elements, they are considered start-end tags
     if (VOID_ELEMENTS.indexOf(obj.name) != -1) {
         obj.end = true;
     }
