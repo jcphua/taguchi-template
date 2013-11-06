@@ -2,6 +2,7 @@
 
 var LETTERS = /\w/;
 var SPACES = /\s/;
+var VOID_ELEMENTS = ["br", "wbr", "hr"];
 
 /** Checks if the input is a letter */
 function is_letter(input) {
@@ -113,6 +114,10 @@ function process_start_tag(input) {
     // no more attributes to consider, just the end of the start tag
     if (input[index] == "/") {
         // this tag is also an end tag
+        obj.end = true;
+    }
+    // for certain void elements, they are considered start-end tags
+    if (VOID_ELEMENTS.indexOf(obj.name) != -1) {
         obj.end = true;
     }
     return obj;
