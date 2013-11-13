@@ -152,22 +152,23 @@ the new string.
 function remove_media_blocks(input) {
     var output = [];
     var start = -1;
-    var count = 0;
     while ((start = input.indexOf("@media")) != -1) {
         output.push(input.substring(0, start - 1));
         // find the end of the @media block
-        for (var i = start; i < input.length; i++) {
+        var count = 0;
+        var i = start;
+        for ( ; i < input.length; i++) {
             if (input[i] == "{") {
                 count++;
             }
             else if (input[i] == "}") {
                 count--;
                 if (count == 0) {
-                    input = input.substring(i + 1);
-                    break
+                    break;
                 }
             }
         }
+        input = (i + 1 == input.length) ? "" : input.substring(i + 1);
     }
     output.push(input);
     return output.join("");
