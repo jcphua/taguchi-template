@@ -146,6 +146,34 @@ function to_start_tag(obj) {
 }
 
 /**
+Removes all media blocks, i.e. @media till its }, in the input, and returns 
+the new string.
+*/
+function remove_media_blocks(input) {
+    var output = [];
+    var start = -1;
+    var count = 0;
+    while ((start = input.indexOf("@media")) != -1) {
+        output.push(input.substring(0, start - 1));
+        // find the end of the @media block
+        for (var i = start; i < input.length; i++) {
+            if (input[i] == "{") {
+                count++;
+            }
+            else if (input[i] == "}") {
+                count--;
+                if (count == 0) {
+                    input = input.substring(i + 1);
+                    break
+                }
+            }
+        }
+    }
+    output.push(input);
+    return output.join("");
+}
+
+/**
 Parses the style into the following object: [{name: string, id: string,
 class: string, parents: [string, ...], style: string}, ...].
 */
@@ -153,6 +181,8 @@ function parse_internal_style(input) {
     var rules = [];
     // remove comments from the input
     input = input.replace(/\/\*.*?\*\//gm, "");
+    // remove all media blocks from the input
+    input = remove_media_blocks(input);
     var pattern = /(.*?)\{([^\}]*)\}/gm;
     var match = pattern.exec(input);
     while (match !== null) {
@@ -161,8 +191,8 @@ function parse_internal_style(input) {
             var rule = {name: "*", id: "*", class: "*", parents: [],
                 style: match[2].replace(/\s+/gm, " ").replace(/"/g, "'")};
             var name = names[j].trim();
-            // ignore any rule starting with '@' or having no style
-            if (name[0] == "@" || rule.style === "") {
+            // ignore no style rule
+            if (rule.style === "") {
                 continue;
             }
             // sort out the parents in the name if any
