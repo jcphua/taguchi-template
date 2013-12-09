@@ -324,7 +324,12 @@ module.exports = function(input) {
                 continue;
             }
             // HTML content, process
-            var tokens = row.split(">", 2);
+            var tokens = null;
+            if (row.substring(0, 5) == "style") {
+                tokens = ["style", row.substring(6)];
+            } else {
+                tokens = row.split(">", 2); 
+            }   
             var tag = tokens[0];
             if (is_letter(tag[0])) { // start tag (perhaps start-end tag)
                 var obj = process_start_tag(tag);
