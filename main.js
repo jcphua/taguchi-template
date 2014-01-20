@@ -347,7 +347,7 @@ exports.define = function(name, openTag, closeTag) {
     // Render a compiled format string, e.g. a link with templated content
     template.renderString = function(tmplString, content, response) {
         var fn = view_to_fn(view.compile(
-                (tmplString || "").replace(/&lt;%/g, "<%").replace(/%&gt;/g, "%>"),
+                (tmplString || "").replace(/&lt;%/g, "{%").replace(/%&gt;/g, "%}"),
                 false, template.openTag, template.closeTag)),
             render_fn = function(view_name, content) {
                 return response.render(view_name, content);
