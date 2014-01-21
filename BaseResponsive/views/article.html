@@ -1,0 +1,152 @@
+{% 
+    /* Create article classes based on width */
+    
+    var w = this.width,
+        articleType;
+    
+    switch(w)
+    {
+    case '1/2':
+        articleType = 'article-half';
+        break;
+    case '1/3':
+        articleType = 'article-third';
+        break;
+    case '1/4':
+        articleType = 'article-quarter';
+        break;
+    default:
+        articleType = 'article-full';
+    }
+    
+    /* Determine size of the 'description' content table */
+    var floatwidth = template.BaseResponsive.itemInteriorWidths[this.width] -  parseInt(this.imgwidth) - template.BaseResponsive.internalPaddingWidth;
+
+    /* Add placeholder image */
+    if (this.imgpos == 'noimage') { 
+        this.image = '';
+    } else if (!this.image) {
+        this.image = 'http://www.fakenamegenerator.com/dummyimage/100x100/CCCCCC/000000/1';
+    }
+%}
+
+{% if (this.columns == true) { %}
+    <!--[if gte mso 9]><td><![endif]-->
+{% } %}
+<table width="{%= template.BaseResponsive.itemInteriorWidths[this.width] %}" align="left" cellspacing="0" cellpadding="0" bgcolor="#ffffff" class="article {%= articleType %} {%= this.mobilewidth %}">
+    {%
+    
+    /* Image Above Structure */
+    
+    if (this.imgpos == 'above') { 
+        this.align = 'center';
+        
+        if (this.title) { %}
+            <tr><td class="title">{%! render('article-title', this) %}</td></tr>
+            <tr><td height="10"></td></tr>
+        {% } %}
+        <tr><td align="center">{%! render('article-image', this) %}</td></tr>
+        <tr><td height="{%= template.BaseResponsive.paddingWidth %}"></td></tr>
+        <tr><td class="description">{%! renderString(this.description) %}</td></tr>
+    {% 
+    
+    /* Image Left Structure */
+    
+    } else if (this.imgpos == 'left') { 
+        this.align = 'left';
+         
+        if (this.title) { %}
+            <tr><td class="title">{%! render('article-title', this) %}</td></tr>
+            <tr><td height="10"></td></tr>
+        {% } %}
+        <tr valign="top">
+            <td align="left" valign="top">
+                <!--[if gte mso 9]><table cellpadding="0" cellspacing="0" border="0"><tr valign="top"><td><![endif]-->
+                {%! render('article-image', this) %}
+                <!--[if gte mso 9]></td><td><![endif]-->
+                <table cellpadding="0" cellspacing="0" border="0" width="{%= floatwidth %}" align="right" class="{%= this.mobilewidth %}">
+                    <tr>
+                        <td class="description" valign="top">{%! renderString(this.description) %}</td>
+                    </tr>        
+                </table>
+                <!--[if gte mso 9]></td></tr></table><![endif]-->
+            </td>
+        </tr>
+    {% 
+    
+    /* Image Left Wrap Structure */
+    
+    } else if (this.imgpos == 'left-wrap') { 
+        this.align = 'left';
+    
+        if (this.title) { %}
+            <tr><td class="title">{%! render('article-title', this) %}</td></tr>
+            <tr><td height="10"></td></tr>
+        {% } %}
+        <tr valign="top">
+            <td class="description" align="left">
+                {%! render('article-image', this) %}
+                {%! renderString(this.description) %}
+            </td>
+        </tr>
+    {% 
+    
+    /* Image Right Structure */
+    
+    } else if (this.imgpos == 'right') { 
+        this.align = 'right';
+    
+        if (this.title) { %}
+            <tr><td class="title">{%! render('article-title', this) %}</td></tr>
+            <tr><td height="10"></td></tr>
+        {% } %}
+        <tr valign="top">
+            <td align="left" valign="top">
+                <!--[if gte mso 9]><table cellpadding="0" cellspacing="0" border="0"><tr valign="top"><td><![endif]-->
+                <!--[if !mso]><!-- --><div class="mobile-bottom"><!--<![endif]-->
+                    <table cellpadding="0" cellspacing="0" border="0" width="{%= floatwidth %}" align="left" class="{%= this.mobilewidth %}">
+                        <tr>
+                            <td class="description">{%! renderString(this.description) %}</td>
+                        </tr>
+                    </table>
+                <!--[if !mso]><!-- --></div><!--<![endif]-->
+                <!--[if gte mso 9]></td><td><![endif]-->
+                <!--[if !mso]><!-- --><div class="mobile-top"><!--<![endif]-->
+                    {%! render('article-image', this) %}
+                <!--[if !mso]><!-- --></div><!--<![endif]-->
+                <!--[if gte mso 9]></td></tr></table><![endif]-->
+            </td>
+        </tr>
+    {% 
+    
+    /* Image Right Wrap Structure */
+    
+    } else if (this.imgpos == 'right-wrap') { 
+        this.align = 'right';
+    
+        if (this.title) { %}
+            <tr><td class="title">{%! render('article-title', this) %}</td></tr>
+            <tr><td height="10"></td></tr>
+        {% } %}
+        <tr valign="top">
+            <td class="description">
+                {%! render('article-image', this) %}
+                {%! renderString(this.description) %}
+            </td>
+        </tr>
+    {% 
+    
+    /* No Image Structure */
+    
+    } else if (this.imgpos == 'noimage') {
+    
+        if (this.title) { %}
+            <tr><td class="title" align="left">{%! render('article-title', this) %}</td></tr>
+            <tr><td height="10"></td></tr>
+        {% } %}
+        <tr><td class="description" align="left">{%! renderString(this.description) %}</td></tr>
+    {% } %}
+</table>
+{% if (this.columns == true) { %}
+    <!--[if gte mso 9]></td><![endif]-->
+{% } %}

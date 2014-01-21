@@ -1,0 +1,6 @@
+{
+	"name": "BaseResponsive",
+	"dependencies": {"template": ">=1.0"},
+	"main": "main.js",
+	"version": "0.1"
+}

@@ -1,0 +1,200 @@
+{
+    "config": {
+        "hostname": "www.taguchimail.com",
+        "mta": "clients.taguchimail.com"
+    },
+	"content": {
+        "subject": "Responsive Layout Newsletter",
+        "text": "This is the plain text part",
+		"channels": {
+		    "content": {
+    	        "items": [
+                    {
+                        "type": "banner",
+                        "image": "http://placehold.it/600x300",
+                        "width": "1/1",
+                        "mobilewidth": "mobile-full",
+                        "title": "Lorem ipsum dolor sit amet",
+                        "imgwidth": "600",
+                        "nopadding": "yes",
+                        "align": "center"
+                    },
+                    {
+                        "type": "spacer",
+                        "height": 20,
+                        "display": "both"
+                    },
+                    {
+                        "type": "article",
+                        "title": "This is a full width article",
+                        "description": "<p><strong>The images for the full-width and half-width items have the correct dimensions for the full-width of the Mobile version.</strong></p><p>When viewed on the wider Desktop mode, they are scaled down accordingly. This is to prevent the images from appearing blury due to being scaled up to fit the mobile width.</p><p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>",
+                        "width": "1/1",
+                        "mobilewidth": "mobile-full",
+                        "imgpos": "left",
+                        "imgwidth": "270",
+                        "nopadding": "no",
+                        "image": "http://placehold.it/320x210"
+                    },
+                    {
+                        "type": "spacer",
+                        "height": 20
+                    },
+                    {
+                        "type": "banner",
+                        "image": "http://placehold.it/560x80",
+                        "width": "1/1",
+                        "mobilewidth": "mobile-hide",
+                        "title": "Lorem ipsum dolor sit amet"
+                    },
+                    {
+                        "type": "spacer",
+                        "height": 20
+                    },
+                    {
+                        "type": "article",
+                        "description": "<p><b>The above banner is swapped for a taller version in the mobile view.</b> Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+                        "title": "This is a half width article",
+                        "width": "1/2",
+                        "mobilewidth": "mobile-full",
+                        "imgpos": "above",
+                        "image": "http://placehold.it/320x150"
+                    },
+                    {
+                        "type": "article",
+                        "description": "<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+                        "title": "Consectetur fermentum",
+                        "width": "1/2",
+                        "mobilewidth": "mobile-full",
+                        "imgpos": "above",
+                        "image": "http://placehold.it/320x150"
+                    },
+                    {
+                        "type": "spacer",
+                        "height": 20
+                    },
+                    {
+                        "type": "article",
+                        "description": "<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>",
+                        "title": "Pellentesque fermentum",
+                        "width": "1/3",
+                        "mobilewidth": "mobile-full",
+                        "imgpos": "above",
+                        "image": "http://placehold.it/174x150"
+                    },
+                    {
+                        "type": "article",
+                        "description": "<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>",
+                        "title": "Pellentesque fermentum",
+                        "width": "1/3",
+                        "mobilewidth": "mobile-full",
+                        "imgpos": "above",
+                        "image": "http://placehold.it/174x150"
+                    },
+                    {
+                        "type": "article",
+                        "description": "<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>",
+                        "title": "Pellentesque fermentum",
+                        "width": "1/3",
+                        "mobilewidth": "mobile-full",
+                        "imgpos": "above",
+                        "image": "http://placehold.it/174x150"
+                    },
+                    {
+                        "type": "spacer",
+                        "height": 20
+                    },
+                    {
+                        "type": "article",
+                        "description": "<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+                        "title": "Pellentesque fermentum",
+                        "width": "1/4",
+                        "mobilewidth": "mobile-half",
+                        "imgpos": "noimage",
+                        "image": null
+                    },
+                    {
+                        "type": "article",
+                        "description": "<p>Consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+                        "title": "Pellentesque fermentum",
+                        "width": "1/4",
+                        "mobilewidth": "mobile-half",
+                        "imgpos": "noimage",
+                        "image": null
+                    },
+                    {
+                        "type": "article",
+                        "description": "<p>Ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+                        "title": "Consectetur",
+                        "width": "1/4",
+                        "mobilewidth": "mobile-half",
+                        "imgpos": "noimage",
+                        "image": null
+                    },
+                    {
+                        "type": "article",
+                        "description": "<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+                        "title": "Pellentesque fermentum",
+                        "width": "1/4",
+                        "mobilewidth": "mobile-half",
+                        "imgpos": "noimage",
+                        "image": null
+                    },
+                    {
+                        "type": "spacer",
+                        "height": 20
+                    },
+                    {
+                        "type": "article",
+                        "description": "<p>Ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+                        "title": "Consectetur",
+                        "width": "3/4",
+                        "mobilewidth": "mobile-full",
+                        "imgpos": "noimage",
+                        "image": null
+                    },
+                    {
+                        "type": "article",
+                        "description": "<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+                        "title": "Pellentesque fermentum",
+                        "width": "1/4",
+                        "mobilewidth": "mobile-full",
+                        "imgpos": "noimage",
+                        "image": null
+                    },
+                    {
+                        "type": "spacer",
+                        "height": 20
+                    },
+                    {
+                        "type": "article",
+                        "description": "<p>Ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+                        "title": "Consectetur",
+                        "width": "2/3",
+                        "mobilewidth": "mobile-full",
+                        "imgpos": "noimage",
+                        "image": null
+                    },
+                    {
+                        "type": "article",
+                        "description": "<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+                        "title": "Pellentesque fermentum",
+                        "width": "1/3",
+                        "mobilewidth": "mobile-full",
+                        "imgpos": "noimage",
+                        "image": null
+                    },
+                    {
+                        "type": "spacer",
+                        "height": 20
+                    }
+                ]
+		    }   
+		}
+	},
+	"id": "app1.1.1234abcd",
+	"recipient": {
+		"email": "email@example.org"
+	},
+	"ref": "send",
+	"protocol": "smtp"
+}

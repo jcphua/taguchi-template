@@ -1,0 +1,120 @@
+<template label="Taguchi Responsive Template" type="email">
+    <attribute type="boolean" label="Link subject line (1-4) with optimization groups" name="locksubjects" />
+    <channel type="content" label="Content" hide="pubDate description">
+        <item type="article" label="Article" closed="yes" summary="title">
+            <content type="text" name="title" label="Title" />
+            <content type="longtext" name="description" label="Content" rte="yes"/>
+            <content type="file" name="image" label="Image (*dimensions required)" />
+            <attribute type="text" name="imgwidth" label="Image Width (w/o px)" />
+            <content type="text" name="link" label="Link URL" />
+            <attribute type="select" name="imgpos" label="Layout">
+                <option value="noimage">No image</option>
+                <option value="above">Image above text</option>
+                <option value="left">Image left of text</option>
+                <option value="right">Image right of text</option>
+                <option value="left-wrap">Image left of text, wrapped</option>
+                <option value="right-wrap">Image right of text, wrapped</option>
+            </attribute>
+            <attribute type="select" name="width" label="Desktop Width">
+                <option value="1/1">Full-width</option>
+                <option value="1/2">Half-width</option>
+                <option value="1/3">Third-width</option>
+                <option value="1/4">Quarter-width</option>
+                <option value="2/3">2/3-width</option>
+                <option value="3/4">3/4-width</option>
+            </attribute>
+            <attribute type="select" name="mobilewidth" label="Mobile Width">
+                <option value="mobile-full">Full-width</option>
+                <option value="mobile-half">Half-width</option>
+                <option value="mobile-hide">Hide on Mobile</option>
+            </attribute>
+            <attribute type="boolean" name="nopadding" label="Remove Row Padding?" />
+            <attribute type="select" name="optgroup" label="Row Optimization Group">
+                <option value="default">Default (all versions)</option>
+                <option value="a">Version A</option>
+                <option value="b">Version B</option>
+                <option value="c">Version C</option>
+                <option value="d">Version D</option>
+            </attribute>
+            <content type="cluster" name="cluster" label="Cluster" />
+        </item>
+        <item type="banner" label="Banner" closed="yes" summary="alttext">
+            <content type="file" name="image" label="Image" />
+            <attribute type="text" name="imgwidth" label="Image Width (w/o px)" />
+            <content type="text" name="alttext" label="Alt Text" />
+            <content type="text" name="link" label="Link URL" />
+            <attribute type="select" name="align" label="Banner Alignment">
+                <option value="center">Center</option>
+                <option value="left">Left</option>
+                <option value="right">Right</option>
+            </attribute>
+            <attribute type="select" name="width" label="Tile Width">
+                <option value="1/1">Full-width</option>
+                <option value="1/2">Half-width</option>
+                <option value="1/3">Third-width</option>
+                <option value="1/4">Quarter-width</option>
+                <option value="2/3">2/3-width</option>
+                <option value="3/4">3/4-width</option>
+            </attribute>
+            <attribute type="select" name="mobilewidth" label="Mobile Width">
+                <option value="mobile-full">Full-width</option>
+                <option value="mobile-half">Half-width</option>
+                <option value="mobile-hide">Hide on Mobile</option>
+            </attribute>
+            <attribute type="boolean" name="nopadding" label="Remove Row Padding?" />
+            <attribute type="select" name="optgroup" label="Row Optimization Group">
+                <option value="default">Default (all versions)</option>
+                <option value="a">Version A</option>
+                <option value="b">Version B</option>
+                <option value="c">Version C</option>
+                <option value="d">Version D</option>
+            </attribute>
+            <content type="cluster" name="cluster" label="Cluster" />
+        </item>
+        <item type="spacer" label="Vertical Space" closed="yes">
+            <content type="select" name="height" label="Height">
+                <option value="10">10px</option>
+                <option value="20">20px</option>
+                <option value="30">30px</option>
+                <option value="40">40px</option>
+                <option value="50">50px</option>
+            </content>
+            <attribute type="select" name="display" label="Display">
+                <option value="">Both</option>
+                <option value="mobile-hide">Hide on Mobile</option>
+            </attribute>
+            <attribute type="select" name="optgroup" label="Row Optimization Group">
+                <option value="default">Default (all versions)</option>
+                <option value="a">Version A</option>
+                <option value="b">Version B</option>
+                <option value="c">Version C</option>
+                <option value="d">Version D</option>
+            </attribute>
+        </item>
+        <item type="raw-html" label="Raw HTML" closed="yes">
+            <content type="longtext" name="description" label="HTML Code" />
+            <attribute type="select" name="width" label="Desktop Width">
+                <option value="1/1">Full-width</option>
+                <option value="1/2">Half-width</option>
+                <option value="1/3">Third-width</option>
+                <option value="1/4">Quarter-width</option>
+                <option value="2/3">2/3-width</option>
+                <option value="3/4">3/4-width</option>
+            </attribute>
+            <attribute type="select" name="mobilewidth" label="Mobile Width">
+                <option value="mobile-full">Full-width</option>
+                <option value="mobile-half">Half-width</option>
+                <option value="mobile-hide">Hide on Mobile</option>
+            </attribute>
+            <attribute type="boolean" name="nopadding" label="Remove Row Padding?" />
+            <attribute type="select" name="optgroup" label="Row Optimization Group">
+                <option value="default">Default (all versions)</option>
+                <option value="a">Version A</option>
+                <option value="b">Version B</option>
+                <option value="c">Version C</option>
+                <option value="d">Version D</option>
+            </attribute>
+            <content type="cluster" name="cluster" label="Cluster" />
+        </item>
+    </channel>
+</template>

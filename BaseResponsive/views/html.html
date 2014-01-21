@@ -1,0 +1,265 @@
+<html>
+    <head>
+        <style>
+        /* Email client hacks
+        ********************************************************/
+    
+        /* Force Hotmail to display emails at full width */
+        body { width: 100% !important; } 
+        .ReadMsgBody, .ExternalClass { width: 100%; }
+
+    	/* Resolves webkit padding issue. */
+    	table { border-spacing: 0; }
+
+    	/* Resolves the Outlook 2007, 2010, and Gmail td padding issue. */
+        table,
+    	table td { border-collapse: collapse;  mso-table-lspace:0; mso-table-rspace:0; }
+    
+        /* Common Layout
+        ********************************************************/
+    
+        .container {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
+    
+    
+        /* Header
+        ********************************************************/
+    
+        .viewonline {
+            background-color: #eeeeee;
+            font-family: helvetica, arial, sans-serif;
+            font-size: 10px;
+            text-align: center;
+            color: #999999;
+            height: 32px;
+        }
+        
+        .viewonline a {
+            color: #00aeef;
+        }
+    
+        .header {
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 28px;
+            font-weight: bold;
+            background: #999999;
+            color: #ffffff;
+            text-align: center;
+        }
+
+        /* Footer
+        ********************************************************/
+    
+        .footer {
+            background-color: #666666;
+            font-family: helvetica, arial, sans-serif;
+            color: #efefef;
+            font-size: 11px;
+            text-align: center;
+        }
+        
+        .footer a {
+            color: #00aeef;
+        }
+    
+        /* Content blocks
+        ********************************************************/
+    
+        .article .title,
+        .article .description {
+            font-family: helvetica, arial, sans-serif;
+            color: #1e1e1e;
+        }
+        
+        .article .title {
+            font-weight: bold;
+        }
+        
+        .article .description a {
+            color: #00aeef;
+        }
+        
+        .article-full .title {
+            font-size: 21px;
+        }
+        
+        .article-half .title {
+            font-size: 18px;
+        }
+    
+        .article-full .description,
+        .article-half .description {
+            font-size: 13px;
+            line-height: 18px;
+        }
+        
+        .article-third .title {
+            font-size: 13px;
+        }
+    
+        .article-third .description {
+            font-size: 12px;
+            line-height: 16px;
+        }
+        
+        .article-quarter .title {
+            font-size: 12px;
+        }
+        
+        .article-third .description,
+        .article-quarter .description {
+            font-size: 11px;
+            line-height: 16px;
+        }
+        
+    
+        /* Mobile Styles
+        ********************************************************/
+    
+        /* Change to "max-width" for testing purposes */
+        
+        @media only screen and (max-device-width: 500px) {
+            
+            body[yahoo] .wrapper,
+            body[yahoo] .mobile-full.no-padding {
+                width: 320px !important;
+            }
+        
+            body[yahoo] .mobile-full { 
+                width: 280px !important;
+                display: block;
+            }
+        
+            body[yahoo] .mobile-half { 
+                width: 130px !important;
+            }
+            
+            body[yahoo] .mobile-hide { 
+                display: none !important;
+            }
+            
+            body[yahoo] .mobile-block { 
+                display: block !important;
+            }
+        
+            body[yahoo] .mobile-center {
+                text-align: center !important;
+            }
+            
+            body[yahoo] .mobile-top {
+                display: table-caption !important;
+            }
+            
+            body[yahoo] .mobile-bottom {
+                display: table-footer-group !important;
+            }
+        
+            body[yahoo] .article-full .title, 
+            body[yahoo] .article-half .title {
+                margin-top: 0 !important;
+                font-size: 21px;
+            }
+        
+            body[yahoo] .article-full .description,
+            body[yahoo] .article-half .description {
+                font-size: 16px !important;
+                line-height: 21px !important;
+            }
+        
+            body[yahoo] .article-third .title,
+            body[yahoo] .article-quarter .title {
+                font-size: 16px !important;
+            }
+        
+            body[yahoo] .article-third .description,
+            body[yahoo] .article-quarter .description {
+                font-size: 14px !important;
+                line-height: 18px !important;
+            }
+        }
+
+        </style>
+
+    </head>
+    <body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" yahoo="fix" class="container" bgcolor="#eeeeee">
+       <div class="container">
+            <!-- Open-rate tracking image -->
+            <img src="{%= "" /*analytics.openTrackingImage(template.BaseEmail.baseURL, request.id) */ %}" width="10" height="1" alt="{%= this.description %}" />
+
+            <table width="100%" cellpadding="0" cellspacing="0" align="center" bgcolor="#eeeeee">
+                <!-- Display the approval header, if present -->
+                {% if (this.header) { %}
+                    <tr>display: none !important;
+                        <td bgcolor="#fffbd9">
+                            <table width="{%= template.BaseResponsive.width %}">
+                                <tr><td>{%! this.header %}</td></tr>
+                            </table>
+                        </td>
+                    </tr>
+                {% } %}
+                <tr>
+                    <td>
+                        <table width="{%= template.BaseResponsive.width %}" cellspacing="0" cellpadding="0" class="wrapper" align="center" bgcolor="#ffffff">
+                            <!-- View online url -->
+                            <tr>
+                                <td class="viewonline" height="32">
+                                    Is this email a mess? <a href="{%= template.BaseResponsive.viewOnlineURL %}" target="_blank">View the online version.</a>
+                                </td>
+                            </tr>
+
+                            <!-- Header -->
+                            <tr>
+                                <td class="header" height="100">
+                                    The Responsive Newsletter
+                                </td>
+                            </tr>
+
+                            <!-- Content -->
+                            <tr>
+                                <td class="wrapper" id="content">
+                                    {% 
+                                    var rows = [], currentWidth = 0, currentRow = [];
+                                    /* Divide the item sequence up into rows. */
+                                    util.each(this.channels.content.items, function (i, item) {
+                                        if (item.type === 'spacer') {
+                                            item.width = '1/1';
+                                        }
+                                        currentWidth += template.BaseResponsive.itemInteriorWidths[item.width];
+                                        if (currentWidth > template.BaseResponsive.width) {
+                                            rows.push(currentRow);
+                                            currentRow = [item];
+                                            currentWidth = template.BaseResponsive.itemInteriorWidths[item.width];
+                                        } else {
+                                            currentRow.push(item);
+                                        }
+                                    });
+                                    if (currentRow.length) {
+                                        rows.push(currentRow);
+                                    }
+                                
+                                    // Render each row.
+                                    util.each(rows, function (i, row) { 
+                                    %}{%! render('content-row', {items: row}) %}{% 
+                                    }) %}
+                                </td>
+                            </tr>
+                            <!-- Footer -->
+                            <tr>
+                                <td height="{%= template.BaseResponsive.paddingWidth %}"></td>
+                            </tr>
+                            <tr>
+                                <td class="footer" height="100">
+                                    Lorem ipsum dolor sit amet | Click here to <a href="{%= template.BaseResponsive.listUnsubscribeURL %}{onclick:Unsubscribed:default}">click here to unsubscribe</a>.
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </body>
+</html>

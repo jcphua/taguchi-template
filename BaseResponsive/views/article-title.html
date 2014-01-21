@@ -1,0 +1,5 @@
+{% if (this.link) { 
+    %}<a href="{%= this.link %}" target="_blank">{%! renderString(this.title) %}</a>{% 
+} else { 
+    %}{%! renderString(this.title) %}{% 
+} %}

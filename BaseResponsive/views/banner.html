@@ -1,0 +1,28 @@
+{% if (this.columns == true) { %}
+    <!--[if gte mso 9]><td><![endif]-->
+{% } %}
+<table width="{%= template.BaseResponsive.itemInteriorWidths[this.width] %}" align="left" cellspacing="0" cellpadding="0" class="{%= this.mobilewidth %}" style="font-size:1px; line-height:0; mso-margin-top-alt:1px;">
+    <tr>
+        <td align="{%= this.align %}">{%
+            var width = this.imgwidth != null ? this.imgwidth : template.BaseResponsive.itemInteriorWidths[this.width],
+                noPadding = this.nopadding != 'yes' ? '' : 'no-padding';
+            
+            if (this.image) {
+                if (this.link) {
+                    %}<a href="{%= this.link %}" target="_blank"><img src="{%= this.image %}" alt="{%= this.alttext %}" align="{%= this.align %}" border="0" width="{%= width %}"  style="display:inline-block" class="{%= this.mobilewidth %} {%= noPadding %}"/></a>{%
+                } else { 
+                    %}<img src="{%= this.image %}" alt="{%= this.alttext %}" align="{%= this.align %}" border="0" width="{%= width %}" style="display:inline-block" class="{%= this.mobilewidth %} {%= noPadding %}" />{%
+                } 
+            } else { 
+                if (this.link) { 
+                    %}<a href="{%= this.link %}" target="_blank"><img src="http://www.fakenamegenerator.com/dummyimage/{%= width %}x100/CCCCCC/000000/1" alt="Placeholder" width="{%= width %}" height="100" border="0"  align="{%= this.align %}" style="display:block; margin: 0;" class="{%= this.mobilewidth %} {%= noPadding %}" /></a>{%
+                } else { 
+                   %}<img src="http://www.fakenamegenerator.com/dummyimage/{%= width %}x100/CCCCCC/000000/1" alt="Placeholder" width="{%= width %}" height="100" border="0"  align="{%= this.align %}" style="display:block; margin: 0;" class="{%= this.mobilewidth %} {%= noPadding %}" />{%
+                } 
+            }
+        %}</td>
+    </tr>
+</table>
+{% if (this.columns == true) { %}
+    <!--[if gte mso 9]></td><![endif]-->
+{% } %}
