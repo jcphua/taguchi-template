@@ -324,7 +324,8 @@ exports.define = function(name, openTag, closeTag) {
             fn = jsonpointer.get(this.views, view_name);
         }
         if (fn === undefined) {
-            return '';
+            throw new Error(
+                "The view '" + view_name + "' could not be found.");
         }
 
         // Pass 'content' as the value of this for the view, along with the

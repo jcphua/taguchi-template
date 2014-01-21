@@ -75,7 +75,7 @@ function compile(module_code, space, open_tag, close_tag) {
         for (m = 0, l = arr.length; m < l; m++) {
             if (arr[m].charAt(0) !== '\x00') {
                 str += (pa ? "+'" : ";$+='") +
-                    arr[m].replace(/(\\|')/g, '\\$1').replace(/\n/g, ' ') + "'";
+                    arr[m].replace(/(\\|')/g, '\\$1').replace(/\n/g, "'+\n'") + "'";
                 pa = true;
             } else if (arr[m].charAt(1) === '!') {
                 str += (pa ? "+(" : ";$+=(") +
@@ -86,7 +86,7 @@ function compile(module_code, space, open_tag, close_tag) {
                     arr[m].substring(2).trim() + ')';
                 pa = true;
             } else {
-                str += ';' + arr[m].substring(1).trim() + ';';
+                str += ';\n' + arr[m].substring(1).trim() + ';';
                 pa = false;
             }
         }
