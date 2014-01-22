@@ -1,34 +1,34 @@
 {%
     var width = this.imgwidth,
-        tablewidth = parseInt(this.imgwidth) + template.BaseResponsive.internalPaddingWidth;
-    
+        tablewidth = parseInt(this.imgwidth) + template.ResponsiveEmail.internalPaddingWidth;
+
     if (this.imgpos == 'above' || this.imgwidth == null) {
-        width = template.BaseResponsive.itemInteriorWidths[this.width];
+        width = template.ResponsiveEmail.itemInteriorWidths[this.width];
         tablewidth = width;
-    }  
+    }
 %}
 
 {% if (this.imgpos == 'above') { %}
 
     {% if (this.link) { %}
         <a href="{%= this.link %}" target="_blank"><img src="{%= this.image %}" alt="{%= this.title %}" width="{%= width %}" style="display: block;" class="{%= this.mobilewidth %}" /></a>
-    {% } else { %} 
+    {% } else { %}
         <img src="{%= this.image %}" alt="{%= this.title %}" style="display:block;border:0" width="{%= width %}" class="{%= this.mobilewidth %}" />
     {% } %}
-    
+
 {% } else { %}
     <table cellpadding="0" cellspacing="0" border="0" align="{%= this.align %}" width="{%= tablewidth  %}" class="{%= this.mobilewidth %}">
         <tr>
-            {% if (this.imgpos == 'right' || this.imgpos ==  'right-wrap') { %}<td width="{%= template.BaseResponsive.paddingWidth %}" class="mobile-hide">&nbsp;</td>{% } %}
+            {% if (this.imgpos == 'right' || this.imgpos ==  'right-wrap') { %}<td width="{%= template.ResponsiveEmail.paddingWidth %}" class="mobile-hide">&nbsp;</td>{% } %}
             <td width="{%= width %}">
                 {% if (this.link) { %}
                     <a href="{%= this.link %}" target="_blank"><img src="{%= this.image %}" alt="{%= this.title %}" width="{%= width %}" style="display: block;" class="{%= this.mobilewidth %}" /></a>
-                {% } else { %} 
+                {% } else { %}
                     <img src="{%= this.image %}" alt="{%= this.title %}" style="display:block;border:0" width="{%= width %}" class="{%= this.mobilewidth %}" />
                 {% } %}
             </td>
-            {% if (this.imgpos == 'left' || this.imgpos == 'left-wrap') { %}<td width="{%= template.BaseResponsive.paddingWidth %}" class="mobile-hide">&nbsp;</td>{% } %}
+            {% if (this.imgpos == 'left' || this.imgpos == 'left-wrap') { %}<td width="{%= template.ResponsiveEmail.paddingWidth %}" class="mobile-hide">&nbsp;</td>{% } %}
         </tr>
-        {% if (this.imgpos != 'noimage') { %}<tr><td height="{%= template.BaseResponsive.paddingWidth %}"></td></tr> {% } %}
+        {% if (this.imgpos != 'noimage') { %}<tr><td height="{%= template.ResponsiveEmail.paddingWidth %}"></td></tr> {% } %}
     </table>
 {% } %}

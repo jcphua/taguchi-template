@@ -1,9 +1,9 @@
-{% 
+{%
     /* Create article classes based on width */
-    
+
     var w = this.width,
         articleType;
-    
+
     switch(w)
     {
     case '1/2':
@@ -18,12 +18,12 @@
     default:
         articleType = 'article-full';
     }
-    
+
     /* Determine size of the 'description' content table */
-    var floatwidth = template.BaseResponsive.itemInteriorWidths[this.width] -  parseInt(this.imgwidth) - template.BaseResponsive.internalPaddingWidth;
+    var floatwidth = template.ResponsiveEmail.itemInteriorWidths[this.width] -  parseInt(this.imgwidth) - template.ResponsiveEmail.internalPaddingWidth;
 
     /* Add placeholder image */
-    if (this.imgpos == 'noimage') { 
+    if (this.imgpos == 'noimage') {
         this.image = '';
     } else if (!this.image) {
         this.image = 'http://www.fakenamegenerator.com/dummyimage/100x100/CCCCCC/000000/1';
@@ -33,28 +33,28 @@
 {% if (this.columns == true) { %}
     <!--[if gte mso 9]><td><![endif]-->
 {% } %}
-<table width="{%= template.BaseResponsive.itemInteriorWidths[this.width] %}" align="left" cellspacing="0" cellpadding="0" bgcolor="#ffffff" class="article {%= articleType %} {%= this.mobilewidth %}">
+<table width="{%= template.ResponsiveEmail.itemInteriorWidths[this.width] %}" align="left" cellspacing="0" cellpadding="0" bgcolor="#ffffff" class="article {%= articleType %} {%= this.mobilewidth %}">
     {%
-    
+
     /* Image Above Structure */
-    
-    if (this.imgpos == 'above') { 
+
+    if (this.imgpos == 'above') {
         this.align = 'center';
-        
+
         if (this.title) { %}
             <tr><td class="title">{%! render('article-title', this) %}</td></tr>
             <tr><td height="10"></td></tr>
         {% } %}
         <tr><td align="center">{%! render('article-image', this) %}</td></tr>
-        <tr><td height="{%= template.BaseResponsive.paddingWidth %}"></td></tr>
+        <tr><td height="{%= template.ResponsiveEmail.paddingWidth %}"></td></tr>
         <tr><td class="description">{%! renderString(this.description) %}</td></tr>
-    {% 
-    
+    {%
+
     /* Image Left Structure */
-    
-    } else if (this.imgpos == 'left') { 
+
+    } else if (this.imgpos == 'left') {
         this.align = 'left';
-         
+
         if (this.title) { %}
             <tr><td class="title">{%! render('article-title', this) %}</td></tr>
             <tr><td height="10"></td></tr>
@@ -67,18 +67,18 @@
                 <table cellpadding="0" cellspacing="0" border="0" width="{%= floatwidth %}" align="right" class="{%= this.mobilewidth %}">
                     <tr>
                         <td class="description" valign="top">{%! renderString(this.description) %}</td>
-                    </tr>        
+                    </tr>
                 </table>
                 <!--[if gte mso 9]></td></tr></table><![endif]-->
             </td>
         </tr>
-    {% 
-    
+    {%
+
     /* Image Left Wrap Structure */
-    
-    } else if (this.imgpos == 'left-wrap') { 
+
+    } else if (this.imgpos == 'left-wrap') {
         this.align = 'left';
-    
+
         if (this.title) { %}
             <tr><td class="title">{%! render('article-title', this) %}</td></tr>
             <tr><td height="10"></td></tr>
@@ -89,13 +89,13 @@
                 {%! renderString(this.description) %}
             </td>
         </tr>
-    {% 
-    
+    {%
+
     /* Image Right Structure */
-    
-    } else if (this.imgpos == 'right') { 
+
+    } else if (this.imgpos == 'right') {
         this.align = 'right';
-    
+
         if (this.title) { %}
             <tr><td class="title">{%! render('article-title', this) %}</td></tr>
             <tr><td height="10"></td></tr>
@@ -117,13 +117,13 @@
                 <!--[if gte mso 9]></td></tr></table><![endif]-->
             </td>
         </tr>
-    {% 
-    
+    {%
+
     /* Image Right Wrap Structure */
-    
-    } else if (this.imgpos == 'right-wrap') { 
+
+    } else if (this.imgpos == 'right-wrap') {
         this.align = 'right';
-    
+
         if (this.title) { %}
             <tr><td class="title">{%! render('article-title', this) %}</td></tr>
             <tr><td height="10"></td></tr>
@@ -134,12 +134,12 @@
                 {%! renderString(this.description) %}
             </td>
         </tr>
-    {% 
-    
+    {%
+
     /* No Image Structure */
-    
+
     } else if (this.imgpos == 'noimage') {
-    
+
         if (this.title) { %}
             <tr><td class="title" align="left">{%! render('article-title', this) %}</td></tr>
             <tr><td height="10"></td></tr>
