@@ -66,7 +66,7 @@ SmartEmail.load(function() {
 SmartEmail.request(function(request, response) {
     this.SmartEmail.trackingServer = this.BaseEmail.baseURL;
     this.SmartEmail.viewOnlineURL = this.BaseEmail.baseURL +
-        '/public/broadcast?sevt={% request.id %}&amp;e={% recipient.hash %}';
+        'public/broadcast?sevt={%= request.id %}&amp;e={%= recipient.hash %}';
     this.BaseEmail.fromAddress = "Taguchi Travel <travel@taguchimail.com>";
     this.BaseEmail.inlineCss = true;
 });
