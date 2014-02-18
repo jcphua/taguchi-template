@@ -35,7 +35,7 @@ ResponsiveEmail.load(function() {
 ResponsiveEmail.request(function(request, response) {
     this.ResponsiveEmail.trackingServer = this.BaseEmail.baseURL;
     this.ResponsiveEmail.viewOnlineURL = this.BaseEmail.baseURL + 
-        '/public/broadcast?sevt={% request.id %}&amp;e={% recipient.hash %}';
+        'public/broadcast?sevt={%= request.id %}&amp;e={%= recipient.hash %}';
     this.BaseEmail.fromAddress = "Taguchi Responsive Template <example@taguchimail.com>";
     this.BaseEmail.inlineCss = true;
 });
