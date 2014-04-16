@@ -158,6 +158,18 @@
                 display: table-footer-group !important;
             }
 
+            body[yahoo] .mobile-box-layout {
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+            }
+            body[yahoo] .mobile-box-layout .mobile-top {
+                display: inherit !important;
+                -webkit-box-ordinal-group: 1;
+            }
+            body[yahoo] .mobile-box-layout .mobile-bottom {
+                -webkit-box-ordinal-group: 2;
+            }
+
             body[yahoo] .article-full .title,
             body[yahoo] .article-half .title {
                 margin-top: 0 !important;
