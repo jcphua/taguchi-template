@@ -2,14 +2,9 @@
 
 var LETTERS = /\w/;
 var SPACES = /\s/;
-var VOID_ELEMENTS = ["area", "base", "br", "col", "command", "embed", "hr", 
-    "img", "input", "keygen", "link", "meta", "param", "source", "track", 
+var VOID_ELEMENTS = ["area", "base", "br", "col", "command", "embed", "hr",
+    "img", "input", "keygen", "link", "meta", "param", "source", "track",
     "wbr"];
-
-/** Checks if the input is a letter */
-function is_letter(input) {
-    return (input !== undefined && LETTERS.test(input));
-}
 
 /**
 Consumes consecutive spaces in the input string starting from the index
@@ -32,11 +27,12 @@ empty string. The caller can calculate the next index from the length of
 the returned string.
 */
 function consume_letters(index, input) {
-    var tmp = [];
-    while (is_letter(input[index])) {
-        tmp.push(input[index++]);
+    var startIdx = index;
+    while (('a' <= input[index] && input[index] <= 'z') ||
+            ('A' <= input[index] && input[index] <= 'Z')) {
+        index++;
     }
-    return tmp.join("");
+    return input.substring(startIdx, index);
 }
 
 /**
@@ -48,13 +44,13 @@ The caller can calculate the next index from the length of the returned
 string, which does not include characters a and b.
 */
 function consume_chars(index, input, a, b) {
-    var tmp = [];
+    var startIdx;
     index++;
+    startIdx = index;
     while (input[index] !== undefined && input[index] != b) {
-        tmp.push(input[index++]);
+        index++;
     }
-    index++;
-    return tmp.join("");
+    return input.substring(startIdx, index);
 }
 
 /**
@@ -73,14 +69,14 @@ function process_start_tag(input) {
     while (true) {
         if (SPACES.test(input[index])) {
             index = consume_spaces(index, input);
-            if (is_letter(input[index])) {
+            if (input[index] && LETTERS.test(input[index])) {
                 var key = consume_letters(index, input);
                 index += key.length;
                 index = consume_spaces(index, input);
                 if (input[index] == "=") {
                     index++;
                     index = consume_spaces(index, input);
-                    if (is_letter(input[index])) {
+                    if (input[index] && LETTERS.test(input[index])) {
                         var val = consume_letters(index, input);
                         index += val.length;
                         obj.attributes[key] = val;
@@ -98,7 +94,7 @@ function process_start_tag(input) {
                     } else {
                         break;
                     }
-                } else if (is_letter(input[index])) {
+                } else if (input[index] && LETTERS.test(input[index])) {
                     obj.attributes[key] = null;
                     index--;  // move back to a space character
                 } else if (input[index] == "/") {
@@ -130,23 +126,18 @@ Returns the start tag string version of the object, previously returned from
 function process_start_tag().
 */
 function to_start_tag(obj) {
-    var tag = ["<", obj.name];
+    var tag = obj.name;
     for (var key in obj.attributes) {
-        tag.push(" ");
-        tag.push(key);
         var val = obj.attributes[key];
         if (val !== null) {
-            tag.push("=\"");
-            tag.push(obj.attributes[key]);
-            tag.push("\"");
+            tag += " " + key + "=\"" + obj.attributes[key] + "\"";
         }
     }
-    tag.push(obj.end ? "/>" : ">");
-    return tag.join("");
+    return "<" + tag + (obj.end ? "/>" : ">");
 }
 
 /**
-Removes all media blocks, i.e. @media till its }, in the input, and returns 
+Removes all media blocks, i.e. @media till its }, in the input, and returns
 the new string.
 */
 function remove_media_blocks(input) {
@@ -238,28 +229,20 @@ function parse_internal_style(input) {
 }
 
 /**
-Parses a space separated attribute value and returns a list, e.g. from 'a b c'
-to ['a', 'b', 'c']
-*/
-function parse_attribute(input) {
-    return (input !== undefined) ? input.split(/\s+/) : [];
-}
-
-/**
 Returns true if the parents matches the hierarchical rule and false otherwise.
 The order of tags/names in the parents and the rule must be descending.
 */
 function match_hierarchical_rule(parents, rule) {
     var next = 0;
     for (var i = 0; i < rule.length; i++) {
-        var r = rule[i];
+        var r = rule[i], rClassExp = new RegExp("(^|\\s)" + r.class + "($|\\s)");
         var found = -1;
         for (var j = next; j < parents.length; j++) {
             var p = parents[j];
+
             if ((r.name == "*" || p.name == r.name) &&
                 (r.id == "*" || p.attributes.id == r.id) &&
-                (r.class == "*" ||
-                 parse_attribute(p.attributes.class).indexOf(r.class) != -1)) {
+                (r.class == "*" || rClassExp.test(p.attributes.class))) {
                 found = j;
                 break;
             }
@@ -281,16 +264,16 @@ change is made to the object directly.
 function apply_internal_style(obj, rules, parents) {
     if (rules.length) {
         // parse the inline style of the object to an object
-        var style = obj.attributes.style || "";
+        var style = obj.attributes.style || "",
+            clsArr = (obj.attributes.class || "").split(/\s+/);
         // check with each internal style rule and apply as inline style if matched
         for (var i = rules.length - 1; i >= 0; i--) {
             var rule = rules[i];
             if ((rule.name == "*" || obj.name == rule.name) &&
                 (rule.id == "*" || obj.attributes.id == rule.id) &&
-                (rule.class == "*" ||
-                 parse_attribute(obj.attributes.class).indexOf(rule.class) != -1) &&
+                (rule.class == "*" || clsArr.indexOf(rule.class) != -1) &&
                 match_hierarchical_rule(parents, rule.parents)) {
-                style = [rule.style, style].join(";");
+                style = rule.style + ";" + style;
             }
         }
         // set the value of attribute style if required
@@ -314,12 +297,12 @@ module.exports = function(input) {
         var row = rows[i];
         if (row !== "") {
             // HTML comment <!-- ... -->, skip
-            if (rows[i].substr(0, 3) == "!--") { 
+            if (rows[i].substr(0, 3) == "!--") {
                 for ( ; i < rows.length; i++) {
                     rows[i] = ["<", rows[i]].join("");
                     if (rows[i].trim().substr(rows[i].trim().length - 3, 3) == "-->") {
                         break;
-                    } 
+                    }
                 }
                 continue;
             }
@@ -328,10 +311,10 @@ module.exports = function(input) {
             if (row.substring(0, 5) == "style") {
                 tokens = ["style", row.substring(6)];
             } else {
-                tokens = row.split(">", 2); 
-            }   
+                tokens = row.split(">", 2);
+            }
             var tag = tokens[0];
-            if (is_letter(tag[0])) { // start tag (perhaps start-end tag)
+            if (tag[0] && LETTERS.test(tag[0])) { // start tag (perhaps start-end tag)
                 var obj = process_start_tag(tag);
                 apply_internal_style(obj, rules, parents);
                 rows[i] = [to_start_tag(obj), tokens[1]].join("");
