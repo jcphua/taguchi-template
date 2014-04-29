@@ -158,6 +158,18 @@
                 display: table-footer-group !important;
             }
 
+            body[yahoo] .mobile-box-layout {
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+            }
+            body[yahoo] .mobile-box-layout .mobile-top {
+                display: inherit !important;
+                -webkit-box-ordinal-group: 1;
+            }
+            body[yahoo] .mobile-box-layout .mobile-bottom {
+                -webkit-box-ordinal-group: 2;
+            }
+
             body[yahoo] .article-full .title,
             body[yahoo] .article-half .title {
                 margin-top: 0 !important;
@@ -188,15 +200,15 @@
     <body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" yahoo="fix" class="container" bgcolor="#eeeeee">
        <div class="container">
             <!-- Open-rate tracking image -->
-            <img src="{%= "" /*analytics.openTrackingImage(template.BaseEmail.baseURL, request.id) */ %}" width="10" height="1" alt="{%= this.description %}" />
+            <img src="{%= analytics.openTrackingImage(template.BaseEmail.baseURL, request.id) %}" width="10" height="1" alt="{%= this.description %}" />
 
             <table width="100%" cellpadding="0" cellspacing="0" align="center" bgcolor="#eeeeee">
                 <!-- Display the approval header, if present -->
                 {% if (this.header) { %}
-                    <tr>display: none !important;
-                        <td bgcolor="#fffbd9">
-                            <table width="{%= template.ResponsiveEmail.width %}">
-                                <tr><td>{%! this.header %}</td></tr>
+                    <tr>
+                        <td bgcolor="#fffbd9" align="center" class="wrapper">
+                            <table width="{%= template.ResponsiveEmail.width %}" align="center" class="wrapper">
+                                <tr><td style="font-family: arial, sans-serif; font-size: 12px; height: 32px;" align="center">This is a proof message. If you wish to comment, you may do so <a href="{%! this.header %}">here</a>.</td></tr>
                             </table>
                         </td>
                     </tr>
@@ -253,7 +265,7 @@
                             </tr>
                             <tr>
                                 <td class="footer" height="100">
-                                    Lorem ipsum dolor sit amet | Click here to <a href="{%= template.ResponsiveEmail.listUnsubscribeURL %}{onclick:Unsubscribed:default}">click here to unsubscribe</a>.
+                                    Lorem ipsum dolor sit amet | Click here to <a href="{%= template.ResponsiveEmail.listUnsubscribeURL %}{unsubscribe}">click here to unsubscribe</a>.
                                 </td>
                             </tr>
                         </table>

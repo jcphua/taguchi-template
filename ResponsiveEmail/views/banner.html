@@ -4,7 +4,7 @@
 <table width="{%= template.ResponsiveEmail.itemInteriorWidths[this.width] %}" align="left" cellspacing="0" cellpadding="0" class="{%= this.mobilewidth %}" style="font-size:1px; line-height:0; mso-margin-top-alt:1px;">
     <tr>
         <td align="{%= this.align %}">{%
-            var width = this.imgwidth != null ? this.imgwidth : template.ResponsiveEmail.itemInteriorWidths[this.width],
+            var width = this.imgwidth == null || this.imgwidth == '' ? template.ResponsiveEmail.itemInteriorWidths[this.width] : this.imgwidth,
                 noPadding = this.nopadding != 'yes' ? '' : 'no-padding';
 
             if (this.image) {

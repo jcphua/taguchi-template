@@ -1,2 +1,2 @@
 Your email client does not support HTML email. To view the full message please visit:
-{%= template.ResponsiveEmail.viewOnlineURL %}
+<{%= template.ResponsiveEmail.viewOnlineURL %}>

@@ -1,5 +1,4 @@
 <template label="Taguchi Responsive Template" type="email">
-    <attribute type="boolean" label="Link subject line (1-4) with optimization groups" name="locksubjects" />
     <channel type="content" label="Content" hide="pubDate description">
         <item type="article" label="Article" closed="yes" summary="title">
             <content type="text" name="title" label="Title" />
