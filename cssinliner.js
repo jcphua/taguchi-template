@@ -12,7 +12,7 @@ the input. The input is the text b/w "<" and ">".
 */
 ATTR_REGEX = /(id|style|class)\s*=\s*('[^']*'|"[^"]*"|[^\s]+)/ig
 function process_start_tag(input) {
-    var obj = {attributes: {}, end: false};
+    var obj = {attributes: {}, end: false, classNames: null, miscAttributes: ""};
     // get the name starting from index 0 until finding a space or "/"
     var match, prevIndex = 0, tokens;
     tokens = /([\w]+)/.exec(input);
@@ -24,13 +24,13 @@ function process_start_tag(input) {
         attrName = match[1];
         attrValue = match[2];
         if (attrValue.length &&
-                (attrValue[0] == '"' || attrValue[0] == "'")) {
+                (attrValue[0] === '"' || attrValue[0] === "'")) {
             attrValue = attrValue.substr(1, attrValue.length - 2);
         }
 
         obj.attributes[attrName] = attrValue;
 
-        obj.miscAttributes += input.substring(prevIndex, match.index);
+        obj.miscAttributes += input.substring(prevIndex, attrName === "style" ? match.index : match.index + match[0].length);
         prevIndex = match.index + match[0].length;
     }
     ATTR_REGEX.lastIndex = 0;
@@ -45,13 +45,11 @@ function process_start_tag(input) {
     }
 
     // for void elements, they are considered start-end tags
-    if (VOID_ELEMENTS.indexOf(obj.name) != -1) {
+    if (VOID_ELEMENTS.indexOf(obj.name) !== -1) {
         obj.end = true;
     }
-    if (obj.attributes.class && obj.attributes.class != "") {
+    if (obj.attributes.class && obj.attributes.class !== "") {
         obj.classNames = obj.attributes.class.split(/\s+/);
-    } else {
-        obj.classNames = null;
     }
     return obj;
 }
@@ -61,15 +59,12 @@ Returns the start tag string version of the object, previously returned from
 function process_start_tag().
 */
 function to_start_tag(obj) {
-    var tag = obj.name;
-    for (var key in obj.attributes) {
-        var val = obj.attributes[key];
-        if (val !== null) {
-            tag += " " + key + "=\"" + obj.attributes[key] + "\"";
-        }
+    var tag = "<" + obj.name + obj.miscAttributes;
+    if (obj.attributes.style !== undefined) {
+        tag += " style=\"" + obj.attributes.style + "\"";
     }
-    tag += obj.miscAttributes;
-    return "<" + tag + (obj.end ? "/>" : ">");
+    tag += (obj.end === true ? "/>" : ">");
+    return tag;
 }
 
 /**
@@ -79,23 +74,23 @@ the new string.
 function remove_media_blocks(input) {
     var output = [];
     var start = -1;
-    while ((start = input.indexOf("@media")) != -1) {
+    while ((start = input.indexOf("@media")) !== -1) {
         output.push(input.substring(0, start - 1));
         // find the end of the @media block
         var count = 0;
         var i = start;
         for ( ; i < input.length; i++) {
-            if (input[i] == "{") {
+            if (input[i] === "{") {
                 count++;
             }
-            else if (input[i] == "}") {
+            else if (input[i] === "}") {
                 count--;
                 if (count == 0) {
                     break;
                 }
             }
         }
-        input = (i + 1 == input.length) ? "" : input.substring(i + 1);
+        input = (i + 1 === input.length) ? "" : input.substring(i + 1);
     }
     output.push(input);
     return output.join("");
@@ -106,7 +101,12 @@ Parses the style into the following object: [{name: string, id: string,
 class: string, parents: [string, ...], style: string}, ...].
 */
 function parse_internal_style(input) {
-    var rules = [];
+    var rules = {
+        byName: {},
+        byClass: {},
+        byId: {},
+        byNameClass: {}
+    };
     // remove comments from the input
     input = input.replace(/\/\*.*?\*\//gm, "");
     // remove all media blocks from the input
@@ -116,7 +116,7 @@ function parse_internal_style(input) {
     while (match !== null) {
         var names = match[1].split(",");
         for (var j = 0; j < names.length; j++) {
-            var rule = {name: "*", id: "*", class: "*", parents: [],
+            var rule = {name: undefined, id: undefined, class: undefined, parents: [],
                 style: match[2].replace(/\s+/gm, " ").replace(/"/g, "'")};
             var name = names[j].trim();
             // ignore no style rule
@@ -127,36 +127,61 @@ function parse_internal_style(input) {
             var tokens = name.split(" ");
             if (tokens.length > 1) {
                 for (var k = 0; k < tokens.length - 1; k++) {
-                    var r = {name: "*", id: "*", class: "*"};
+                    var r = {name: undefined, id: undefined, class: undefined};
                     var p = tokens[k];
-                    if (p.indexOf("#") != -1) {
+                    if (p.indexOf("#") !== -1) {
                         p = p.split("#", 2);
-                        r.name = p[0].trim() || "*";
-                        r.id = p[1].trim() || "*";
-                    } else if (p.indexOf(".") != -1) {
+                        r.name = p[0].trim() || undefined;
+                        r.id = p[1].trim() || undefined;
+                    } else if (p.indexOf(".") !== -1) {
                         p = p.split(".", 2);
-                        r.name = p[0].trim() || "*";
-                        r.class = p[1].trim() || "*";
+                        r.name = p[0].trim() || undefined;
+                        r.class = p[1].trim() || undefined;
                     } else {
-                        r.name = p.trim() || "*";
+                        r.name = p.trim() || undefined;
                     }
                     rule.parents.unshift(r);
                 }
                 name = tokens[tokens.length - 1];
             }
             // sort out the class and id in the name if any
-            if (name.indexOf("#") != -1) {
+            if (name.indexOf("#") !== -1) {
                 tokens = name.split("#", 2);
-                rule.name = tokens[0].trim() || "*";
-                rule.id = tokens[1].trim() || "*";
-            } else if (name.indexOf(".") != -1) {
+                rule.name = tokens[0].trim() || undefined;
+                rule.id = tokens[1].trim() || undefined;
+            } else if (name.indexOf(".") !== -1) {
                 tokens = name.split(".", 2);
-                rule.name = tokens[0].trim() || "*";
-                rule.class = tokens[1].trim() || "*";
+                rule.name = tokens[0].trim() || undefined;
+                rule.class = tokens[1].trim() || undefined;
             } else {
-                rule.name = name.trim() || "*";
+                rule.name = name.trim() || undefined;
             }
-            rules.push(rule);
+            // add to the appropriate object
+            if (rule.id !== undefined) {
+                if (rules.byId[rule.id] !== undefined) {
+                    rules.byId[rule.id].push(rule);
+                } else {
+                    rules.byId[rule.id] = [rule];
+                }
+            } else if (rule.class !== undefined && rule.name !== undefined) {
+                if (rules.byNameClass[rule.name + "." + rule.class] !== undefined) {
+                    rules.byNameClass[rule.name + "." + rule.class].push(rule);
+                } else {
+                    rules.byNameClass[rule.name + "." + rule.class] = [rule];
+                }
+            } else if (rule.class !== undefined) {
+                if (rules.byClass[rule.class] !== undefined) {
+                    rules.byClass[rule.class].push(rule);
+                } else {
+                    rules.byClass[rule.class] = [rule];
+                }
+            } else if (rule.name !== undefined) {
+                if (rules.byName[rule.name] !== undefined) {
+                    rules.byName[rule.name].push(rule);
+                } else {
+                    rules.byName[rule.name] = [rule];
+                }
+            }
         }
         // proceed to the next match
         match = pattern.exec(input);
@@ -177,10 +202,10 @@ function match_hierarchical_rule(parents, rule) {
 
         for (j = next; j < jl; j++) {
             p = parents[j];
-            if ((r.name == "*" || p.name == r.name) &&
-                (r.id == "*" || p.attributes.id == r.id) &&
-                (r.class == "*" ||
-                    (p.classNames && p.classNames.indexOf(r.class) != -1))) {
+            if ((r.name === undefined || p.name === r.name) &&
+                (r.id === undefined || p.attributes.id === r.id) &&
+                (r.class === undefined ||
+                    (p.classNames !== null && p.classNames.indexOf(r.class) !== -1))) {
                 found = j;
                 break;
             }
@@ -201,27 +226,46 @@ Applies the style according to the rules to attribute style of the object. The
 change is made to the object directly.
 */
 function apply_internal_style(obj, rules, parents) {
-    if (rules.length) {
-        // parse the inline style of the object to an object
-        var style = "";
-        // check with each internal style rule and apply as inline style if matched
-        for (var i = 0, l = rules.length; i < l; i++) {
-            var rule = rules[i];
-            if ((rule.name == "*" || obj.name == rule.name) &&
-                (rule.id == "*" || obj.attributes.id == rule.id) &&
-                (rule.class == "*" ||
-                    (obj.classNames &&
-                    obj.classNames.indexOf(rule.class) != -1)) &&
-                match_hierarchical_rule(parents, rule.parents)) {
-                style += rule.style + ";";
+    // parse the inline style of the object to an object
+    var style = "", i = 0;
+    // check with each internal style rule and apply as inline style if matched
+    var rulesToApply = [];
+    if (obj.name !== undefined && rules.byName[obj.name] !== undefined) {
+        rulesToApply.push.apply(rulesToApply, rules.byName[obj.name]);
+    }
+    if (obj.classNames !== null) {
+        for (i = 0; i < obj.classNames; i++) {
+            if (rules.byClass[obj.classNames[i]] !== undefined) {
+                rulesToApply.push.apply(rulesToApply, rules.byClass[obj.classNames[i]]);
             }
         }
-        style += (obj.attributes.style || "");
-        // set the value of attribute style if required
-        if (style !== "") {
-            // replace multiple ;s with just one ;
-            obj.attributes.style = style.replace(/;\s*;/gm, ";");
+
+        if (obj.name !== undefined) {
+            for (i = 0; i < obj.classNames; i++) {
+                if (rules.byNameClass[obj.name + "." + obj.classNames[i]]
+                        !== undefined) {
+                    rulesToApply.push.apply(rulesToApply, rules.byNameClass[obj.name + "." + obj.classNames[i]]);
+                }
+            }
         }
+    }
+    if (obj.attributes.id !== undefined &&
+            rules.byId[obj.attributes.id] !== undefined) {
+        rulesToApply.push.apply(rulesToApply, rules.byId[obj.attributes.id]);
+    }
+
+    for (i = 0, l = rulesToApply.length; i < l; i++) {
+        var rule = rulesToApply[i];
+        if (rule.parents.length === 0 ||
+                match_hierarchical_rule(parents, rule.parents)) {
+            style += rule.style + ";";
+        }
+    }
+    style += (obj.attributes.style || "");
+    // set the value of attribute style if required
+    if (style !== "") {
+        // replace multiple ;s with just one ;
+        obj.attributes.style = style.replace(/;\s*;/gm, ";");
     }
 }
 
@@ -231,7 +275,8 @@ leading spaces.
 */
 module.exports = function(input) {
     var parents = [];
-    var rules = [];
+    var rules = {byId: {}, byName: {}, byClass: {}, byClassName: {}};
+
     // need to remove spaces before the first tag (a corner case)
     var rows = input.trim().split("<"), out = "";
     for (var i = 0; i < rows.length; i++) {
