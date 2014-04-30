@@ -234,14 +234,14 @@ function apply_internal_style(obj, rules, parents) {
         rulesToApply.push.apply(rulesToApply, rules.byName[obj.name]);
     }
     if (obj.classNames !== null) {
-        for (i = 0; i < obj.classNames; i++) {
+        for (i = 0; i < obj.classNames.length; i++) {
             if (rules.byClass[obj.classNames[i]] !== undefined) {
                 rulesToApply.push.apply(rulesToApply, rules.byClass[obj.classNames[i]]);
             }
         }
 
         if (obj.name !== undefined) {
-            for (i = 0; i < obj.classNames; i++) {
+            for (i = 0; i < obj.classNames.length; i++) {
                 if (rules.byNameClass[obj.name + "." + obj.classNames[i]]
                         !== undefined) {
                     rulesToApply.push.apply(rulesToApply, rules.byNameClass[obj.name + "." + obj.classNames[i]]);
