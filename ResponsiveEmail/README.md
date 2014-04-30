@@ -56,7 +56,7 @@ will produce the inline style:
 		<a href="#" style="color: #c0ffee; color: #ff0000">Linkage</a>
 	</td>
 
-To get around eccessive inlined styles, it best to target base elements selectively.
+To avoid duplicate inlined styles on a single element, it's best to use targeted class selectors.
 
 ## Responsive Hacks
 
