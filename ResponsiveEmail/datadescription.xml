@@ -1,6 +1,7 @@
 <template label="Taguchi Responsive Template" type="email">
+    <attribute type="boolean" name="multivariate" label="Enable multivariate testing" />
     <channel type="content" label="Content" hide="pubDate description">
-        <item type="article" label="Article" closed="yes" summary="title">
+        <item type="article" label="Article" closed="yes" summary="title" alternatives="yes">
             <content type="text" name="title" label="Title" />
             <content type="longtext" name="description" label="Content" rte="yes"/>
             <content type="file" name="image" label="Image (*dimensions required)" />
@@ -28,16 +29,9 @@
                 <option value="mobile-hide">Hide on Mobile</option>
             </attribute>
             <attribute type="boolean" name="nopadding" label="Remove Row Padding?" />
-            <attribute type="select" name="optgroup" label="Row Optimization Group">
-                <option value="default">Default (all versions)</option>
-                <option value="a">Version A</option>
-                <option value="b">Version B</option>
-                <option value="c">Version C</option>
-                <option value="d">Version D</option>
-            </attribute>
             <content type="cluster" name="cluster" label="Cluster" />
         </item>
-        <item type="banner" label="Banner" closed="yes" summary="alttext">
+        <item type="banner" label="Banner" closed="yes" summary="alttext" alternatives="yes">
             <content type="file" name="image" label="Image" />
             <attribute type="text" name="imgwidth" label="Image Width (w/o px)" />
             <content type="text" name="alttext" label="Alt Text" />
@@ -61,13 +55,6 @@
                 <option value="mobile-hide">Hide on Mobile</option>
             </attribute>
             <attribute type="boolean" name="nopadding" label="Remove Row Padding?" />
-            <attribute type="select" name="optgroup" label="Row Optimization Group">
-                <option value="default">Default (all versions)</option>
-                <option value="a">Version A</option>
-                <option value="b">Version B</option>
-                <option value="c">Version C</option>
-                <option value="d">Version D</option>
-            </attribute>
             <content type="cluster" name="cluster" label="Cluster" />
         </item>
         <item type="spacer" label="Vertical Space" closed="yes">
@@ -81,13 +68,6 @@
             <attribute type="select" name="display" label="Display">
                 <option value="">Both</option>
                 <option value="mobile-hide">Hide on Mobile</option>
-            </attribute>
-            <attribute type="select" name="optgroup" label="Row Optimization Group">
-                <option value="default">Default (all versions)</option>
-                <option value="a">Version A</option>
-                <option value="b">Version B</option>
-                <option value="c">Version C</option>
-                <option value="d">Version D</option>
             </attribute>
         </item>
         <item type="raw-html" label="Raw HTML" closed="yes">
@@ -106,13 +86,6 @@
                 <option value="mobile-hide">Hide on Mobile</option>
             </attribute>
             <attribute type="boolean" name="nopadding" label="Remove Row Padding?" />
-            <attribute type="select" name="optgroup" label="Row Optimization Group">
-                <option value="default">Default (all versions)</option>
-                <option value="a">Version A</option>
-                <option value="b">Version B</option>
-                <option value="c">Version C</option>
-                <option value="d">Version D</option>
-            </attribute>
             <content type="cluster" name="cluster" label="Cluster" />
         </item>
     </channel>
