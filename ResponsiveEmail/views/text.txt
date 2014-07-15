@@ -1,2 +1,41 @@
-Your email client does not support HTML email. To view the full message please visit:
+{%
+    var _blockItems_content = (this.channels && this.channels.content)? this.channels.content.items : null,
+        outputBlockItemTypes = ['article']; // append valid block item types to this Array
+    
+    var firstBlock = false;
+    if (_blockItems_content) {
+        util.each(_blockItems_content, function(i, item) {
+            if (firstBlock) { return false; }
+            
+            if (!(new RegExp("^(" + outputBlockItemTypes.join("|") + ")$").test(item.type))) { return true; }
+            
+            if (item.title) { %}
+{%= renderString(item.title) %}
+
+{%          }
+            if (item.description) { %}
+{%= renderString((item.description).replace(/(<([^>]+)>)/ig, '')) %}
+
+{%          }
+            
+            firstBlock = true;
+        });
+    }
+%}
+
+{% 
+if (firstBlock) { 
+%}
+------------------------------ 
+
+{% 
+}
+%}
+Your Email client doesn't appear to support HTML Emails-- you may not be seeing the full message!
+
+To view the full message online, please click the link below:
+
 <{%= template.ResponsiveEmail.viewOnlineURL %}>
+
+
+
