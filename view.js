@@ -48,7 +48,7 @@ function compile(module_code, space, open_tag, close_tag) {
             c = close_tag || '%}';
 
     if (space === 'preserve') {
-        arr = module_code.replace(/[\r\t]/g, '')
+        arr = module_code.replace(/\r/g, '\n')
                 .split(o).join(c+'\x00').split(c);
         for (m = 0, l = arr.length; m < l; m++) {
             if (arr[m].charAt(0) !== '\x00') {

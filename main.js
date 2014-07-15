@@ -146,7 +146,7 @@ exports.define = function(name, openTag, closeTag) {
                 viewname = path.basename(fpath).split('.')[0];
                 self.views[name][viewname] = view_to_fn(
                     view.compile(file.content,
-                        path.extname(fpath) === 'txt' ? true : false,
+                        path.extname(fpath) === '.txt' ? "preserve" : false,
                         template.openTag, template.closeTag)
                 );
             }
@@ -252,8 +252,8 @@ exports.define = function(name, openTag, closeTag) {
         }
         // replace that module's view
         this.views[module_name][view_name] = view_to_fn(
-            view.compile(file.content, path.extname(view_file_path) === 'txt'
-                ? true : false, template.openTag, template.closeTag));
+            view.compile(file.content, path.extname(view_file_path) === '.txt'
+                ? "preserve" : false, template.openTag, template.closeTag));
         return this;
     };
 

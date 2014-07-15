@@ -42,12 +42,12 @@ function process_start_tag(input) {
         obj.miscAttributes += input.substring(prevIndex, input.length - 1);
     } else {
         obj.miscAttributes += input.substr(prevIndex);
+        // for void elements, they are considered start-end tags
+        if (VOID_ELEMENTS.indexOf(obj.name) !== -1) {
+            obj.end = true;
+        }
     }
 
-    // for void elements, they are considered start-end tags
-    if (VOID_ELEMENTS.indexOf(obj.name) !== -1) {
-        obj.end = true;
-    }
     if (obj.attributes.class && obj.attributes.class !== "") {
         obj.classNames = obj.attributes.class.split(/\s+/);
     }
